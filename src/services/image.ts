@@ -1,4 +1,4 @@
-import { executeImageTask } from '@/utils/ai-executor'
+import { executeImageTask } from '@/core/execution/image'
 import { getNextImageModel } from '@/core/orchestration'
 import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
 import { getImageSize, toWebp } from '@/infra/processors/sharp'
@@ -18,7 +18,7 @@ export const imageService = {
 
     const task = await executeImageTask({
       model,
-      prompt,
+      messages: [{ role: 'user', content: prompt }],
     })
 
     if (!task.result) {
