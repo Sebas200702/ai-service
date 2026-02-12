@@ -1,5 +1,5 @@
 // services/text/index.ts
-import { executeTextTask, executeStreamText } from '@/utils/ai-executor'
+import { executeTextTask, executeStreamText } from '@/core/execution/text'
 import { getNextTextModel } from '@/core/orchestration'
 import type { StandardTextResult, TextStream } from '@/types'
 
