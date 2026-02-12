@@ -1,9 +1,12 @@
 import type { ModelMetadata } from '@/types'
-export interface Metrics extends ModelMetadata {
+
+export interface TokenUsage {
   inputTokens: number
   outputTokens: number
   totalTokens: number
+}
 
+export interface Metrics extends ModelMetadata, TokenUsage {
   latency: number
   timeToFirstToken?: number
 
@@ -13,4 +16,9 @@ export interface Metrics extends ModelMetadata {
   fallbackUsed: boolean
 
   timestamp: number
+}
+
+export interface RecordedResult<T> {
+  result: T
+  metrics: Metrics
 }
