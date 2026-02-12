@@ -2,7 +2,6 @@ import { Elysia } from 'elysia'
 import { createResponseSchema } from '@/http/openapi/open-api'
 import { textController } from '@/http/controllers/text'
 import { inputTextSchema, generatedTextSchema } from '@/schemas/text'
-import { streamEventSchema } from '@/schemas/stream'
 export const textRoutes = new Elysia({ prefix: '/text' })
   .post(
     '/generate',
