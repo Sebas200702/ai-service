@@ -1,20 +1,16 @@
-import type { Context } from 'hono'
-import { HTTPException } from 'hono/http-exception'
-import type { ContentfulStatusCode, StatusCode } from 'hono/utils/http-status'
 import { ZodError } from 'zod'
 
 import type { ApiResponse } from '@/types'
 
-
 export class AppError extends Error {
-  public readonly statusCode: StatusCode
+  public readonly statusCode: number
   public readonly code: string
   public readonly isOperational: boolean
 
   constructor(
     message: string,
-    statusCode: StatusCode = 500,
-    code = 'INTERNAL_SERVER_ERROR',
+    statusCode = 500,
+    code = 'INTERNAL_SERVER_ERROR'
   ) {
     super(message)
     this.statusCode = statusCode
@@ -46,14 +42,20 @@ export class AppError extends Error {
 
   static Internal(
     message = 'Internal Server Error',
-    code = 'INTERNAL_SERVER_ERROR',
+    code = 'INTERNAL_SERVER_ERROR'
   ) {
     return new AppError(message, 500, code)
   }
 }
 
-export const onError = (err: Error | HTTPException, c: Context) => {
-  let statusCode: StatusCode = 500
+export const onError = ({
+  error: err,
+  set,
+}: {
+  error: Error
+  set: { status: number }
+}) => {
+  let statusCode = 500
   const response: ApiResponse<null> = {
     success: false,
     error: {
@@ -79,12 +81,6 @@ export const onError = (err: Error | HTTPException, c: Context) => {
         message: e.message,
       })),
     }
-  } else if (err instanceof HTTPException) {
-    statusCode = err.status as StatusCode
-    response.error = {
-      code: 'HTTP_ERROR',
-      message: err.message,
-    }
   } else if (err instanceof SyntaxError) {
     statusCode = 400
     response.error = {
@@ -106,18 +102,6 @@ export const onError = (err: Error | HTTPException, c: Context) => {
     console.error({ err }, '❌ Unhandled Error')
   }
 
-  return c.json(response, statusCode as ContentfulStatusCode)
-}
-
-export const notFound = (c: Context) => {
-  return c.json(
-    {
-      success: false,
-      error: {
-        code: 'NOT_FOUND',
-        message: `Route not found: ${c.req.path}`,
-      },
-    },
-    404,
-  )
+  set.status = statusCode
+  return response
 }
