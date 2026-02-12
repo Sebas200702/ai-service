@@ -1,8 +1,22 @@
+import { Elysia } from 'elysia'
 import { imageController } from '@/http/controllers/image'
-import { createOpenApiRouter } from '@/http/openapi/openapi-router'
-import { generateImageRoute } from '@/http/openapi/image.openapi'
+import { createResponseSchema } from '@/http/openapi/open-api'
+import { generatedImageSchema } from '@/schemas/generated-image'
+import { z } from 'zod'
 
-export const imageRouter = createOpenApiRouter()
+const inputImageSchema = z.object({
+  prompt: z.string(),
+})
 
-imageRouter.openapi(generateImageRoute, imageController.generateImage)
-
+export const imageRoutes = new Elysia({ prefix: '/image' }).post(
+  '/generate',
+  async ({ body }) => {
+    return await imageController.generateImage({ prompt: body.prompt })
+  },
+  {
+    body: inputImageSchema,
+    response: {
+      200: createResponseSchema(generatedImageSchema),
+    },
+  }
+)
