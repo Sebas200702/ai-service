@@ -44,7 +44,7 @@ export const textService = {
     yield { type: 'start', modelMetadata }
 
     const result = executeStreamText({
-      model: model.model,
+      model,
       messages: [{ role: 'user', content: prompt }],
     })
 
