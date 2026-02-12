@@ -1,9 +1,11 @@
 import { executeImageTask } from '@/core/execution/image'
+import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextImageModel } from '@/core/orchestration'
 import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
-import { getImageSize, toWebp } from '@/infra/processors/sharp'
+import { proccesImage } from '@/infra/processors/sharp'
 import type { GeneratedImage } from '@/schemas/generated-image'
 import type { ModelMetadata } from '@/types'
+import { AppError } from '@/http/middlewares/error'
 
 export const imageService = {
   async generateImage(prompt: string): Promise<{
@@ -13,33 +15,37 @@ export const imageService = {
     const model = getNextImageModel()
 
     if (!model) {
-      throw new Error('No image models available')
+      throw new AppError('No image models available', 500)
     }
 
-    const task = await executeImageTask({
-      model,
-      messages: [{ role: 'user', content: prompt }],
-    })
+    const { result: task, metrics } = await metricsRecorder(
+      () =>
+        executeImageTask({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      { provider: model.provider, modelId: model.id, type: 'image' }
+    )
 
     if (!task.result) {
-      throw new Error('Image generation failed')
+      throw new AppError('Image generation failed', 500)
     }
 
-    const buffer = task.result.uint8Array
-      ? Buffer.from(task.result.uint8Array)
-      : Buffer.from(task.result.base64, 'base64')
+    const { base64 } = task.result
+    const buffer = Buffer.from(base64, 'base64')
 
-    // Convert to WebP before uploading to ensure allowed extension
-    const webpBuffer = await toWebp(buffer, 80)
-    const fileName = `generated-image-${Date.now()}.webp`
+    const {
+      buffer: webpBuffer,
+      width,
+      height,
+      fileName,
+    } = await proccesImage(buffer, 80)
 
     const uploaded = await createFile({
       buffer: webpBuffer,
       name: fileName,
     })
     const imageUrl = getPublicFilePreviewUrl(uploaded.$id)
-
-    const { width, height } = await getImageSize(webpBuffer)
 
     return {
       data: {
@@ -49,8 +55,8 @@ export const imageService = {
         altText: `Generated image for prompt: ${prompt}`,
       },
       modelMetadata: {
-        provider: model.provider,
-        modelId: model.id,
+        provider: metrics.provider,
+        modelId: metrics.modelId,
         type: 'image',
       },
     }
