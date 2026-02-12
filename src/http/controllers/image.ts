@@ -16,4 +16,3 @@ const generateImage = async (input: { prompt: string }) => {
 export const imageController = {
   generateImage,
 }
-
