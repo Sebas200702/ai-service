@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia'
 
-export const requireJson = new Elysia({ name: 'require-json' })
-  .onBeforeHandle(({ request, set }) => {
+export const requireJson = new Elysia({ name: 'require-json' }).onBeforeHandle(
+  ({ request, set }) => {
     const method = request.method
 
     if (['POST', 'PUT', 'PATCH'].includes(method)) {
@@ -16,5 +16,5 @@ export const requireJson = new Elysia({ name: 'require-json' })
         }
       }
     }
-  })
-
+  }
+)
