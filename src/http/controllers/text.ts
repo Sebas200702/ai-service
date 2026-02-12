@@ -1,9 +1,7 @@
 import { textService } from '@/services/text'
-import {createEventStream} from '@/core/streaming/stream-builder'
+import { createEventStream } from '@/core/streaming/stream-builder'
 
-const generateText = async (input: {
-  prompt: string
-}) => {
+const generateText = async (input: { prompt: string }) => {
   const { data, modelMetadata } = await textService.generate(input.prompt)
   return {
     mode: 'standard' as const,
@@ -12,16 +10,12 @@ const generateText = async (input: {
   }
 }
 
-const streamGenerateText = (input: {
-  prompt: string
-}) => {
+const streamGenerateText = (input: { prompt: string }) => {
   const stream = textService.stream(input.prompt)
-  return cr
-
-
-
-
-  
+  return {
+    mode: 'streaming' as const,
+    stream: createEventStream(stream),
+  }
 }
 
 export const textController = {
