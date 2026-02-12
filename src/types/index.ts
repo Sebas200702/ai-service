@@ -1,9 +1,12 @@
 import type { StreamEvent } from '@/core/streaming/events'
 import type { GeneratedText } from '@/schemas/text'
+
+
+type AIModalities = 'text' | 'image' | 'voice' | 'transcription'
 export interface AIModelDescriptor<T> {
   id: string
   provider: string
-  type: 'text' | 'image' | 'voice' | 'transcription'
+  type: AIModalities
   model: T
 }
 
@@ -17,7 +20,7 @@ export interface ApiResponse<T> {
 export interface ModelMetadata {
   modelId: string
   provider: string
-  type: 'text' | 'image' | 'voice' | 'transcription'
+  type: AIModalities
 }
 
 interface ErrorData {
