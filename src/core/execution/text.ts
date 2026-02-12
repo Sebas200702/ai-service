@@ -5,7 +5,7 @@ export const executeTextTask = async ({
   model,
   messages,
 }: ExecuteTextTaskInput): Promise<AITaskResult<string>> => {
-  const { text } = await generateText({
+  const { text, usage } = await generateText({
     model: model.model,
     messages: messages ?? [],
   })
@@ -14,6 +14,11 @@ export const executeTextTask = async ({
     result: text,
     provider: model.provider,
     modelId: model.id,
+    usage: {
+      promptTokens: usage.inputTokens ?? 0,
+      completionTokens: usage.outputTokens ?? 0,
+      totalTokens: usage.totalTokens ?? 0,
+    },
   }
 }
 
