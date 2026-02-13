@@ -14,6 +14,12 @@ export const normalizePath = new Elysia({
     }
   } catch (err) {
     console.error('Error normalizing path:', err)
-    throw new AppError({ service: 'http', operation: 'normalize_path', reason: 'Invalid URL', status: 'Bad Request', cause: err })
+    throw new AppError({
+      service: 'http',
+      operation: 'normalize_path',
+      reason: 'Invalid URL',
+      status: 'Bad Request',
+      cause: err,
+    })
   }
 })
