@@ -19,4 +19,4 @@ export const app = new Elysia()
   .use(audioRoutes)
   .listen(CONFIG.PORT)
 
-console.log(`🚀 API running on http://localhost:${CONFIG.PORT}`)
+
