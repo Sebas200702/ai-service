@@ -1,107 +1,243 @@
+import type { StatusMap } from 'elysia'
 import { ZodError } from 'zod'
 
 import type { ApiResponse } from '@/types'
 
+type HttpStatus = keyof StatusMap
+
+interface ErrorContext {
+  service: string
+  operation: string
+  reason: string
+  status?: HttpStatus
+  metadata?: Record<string, unknown>
+  cause?: unknown
+}
+
 export class AppError extends Error {
-  public readonly statusCode: number
+  public readonly status: HttpStatus
   public readonly code: string
-  public readonly isOperational: boolean
+  public readonly service: string
+  public readonly operation: string
+  public readonly metadata?: Record<string, unknown>
+  public readonly timestamp: string
 
-  constructor(
-    message: string,
-    statusCode = 500,
-    code = 'INTERNAL_SERVER_ERROR'
-  ) {
-    super(message)
-    this.statusCode = statusCode
-    this.code = code
-    this.isOperational = true
+  constructor(ctx: ErrorContext) {
+    super(ctx.reason)
+    this.status = ctx.status ?? 'Internal Server Error'
+    this.code = `${ctx.service}.${ctx.operation}`.toUpperCase()
+    this.service = ctx.service
+    this.operation = ctx.operation
+    this.metadata = ctx.metadata
+    this.timestamp = new Date().toISOString()
 
+    if (ctx.cause) this.cause = ctx.cause
     Object.setPrototypeOf(this, AppError.prototype)
   }
 
-  static BadRequest(message: string, code = 'BAD_REQUEST') {
-    return new AppError(message, 400, code)
+  toJSON() {
+    return {
+      code: this.code,
+      service: this.service,
+      operation: this.operation,
+      message: this.message,
+      status: this.status,
+      metadata: this.metadata,
+      timestamp: this.timestamp,
+      stack: this.stack,
+    }
   }
 
-  static Unauthorized(message = 'Unauthorized', code = 'UNAUTHORIZED') {
-    return new AppError(message, 401, code)
+  static BadRequest(
+    service: string,
+    operation: string,
+    reason: string,
+    metadata?: Record<string, unknown>
+  ) {
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Bad Request',
+      metadata,
+    })
   }
 
-  static Forbidden(message = 'Forbidden', code = 'FORBIDDEN') {
-    return new AppError(message, 403, code)
+  static Unauthorized(
+    service: string,
+    operation: string,
+    reason = 'Unauthorized',
+    metadata?: Record<string, unknown>
+  ) {
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Unauthorized',
+      metadata,
+    })
   }
 
-  static NotFound(message = 'Resource not found', code = 'NOT_FOUND') {
-    return new AppError(message, 404, code)
+  static Forbidden(
+    service: string,
+    operation: string,
+    reason = 'Forbidden',
+    metadata?: Record<string, unknown>
+  ) {
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Forbidden',
+      metadata,
+    })
   }
 
-  static Conflict(message: string, code = 'CONFLICT') {
-    return new AppError(message, 409, code)
+  static NotFound(
+    service: string,
+    operation: string,
+    reason = 'Resource not found',
+    metadata?: Record<string, unknown>
+  ) {
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Not Found',
+      metadata,
+    })
+  }
+
+  static Conflict(
+    service: string,
+    operation: string,
+    reason: string,
+    metadata?: Record<string, unknown>
+  ) {
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Conflict',
+      metadata,
+    })
   }
 
   static Internal(
-    message = 'Internal Server Error',
-    code = 'INTERNAL_SERVER_ERROR'
+    service: string,
+    operation: string,
+    reason = 'Internal server error',
+    metadata?: Record<string, unknown>
   ) {
-    return new AppError(message, 500, code)
+    return new AppError({
+      service,
+      operation,
+      reason,
+      status: 'Internal Server Error',
+      metadata,
+    })
   }
 }
 
+const errorResponse = (error: AppError): ApiResponse<null> => ({
+  success: false,
+  data: null,
+  error: {
+    code: error.code,
+    message: error.message,
+  },
+})
+
 export const onError = ({
+  code,
   error: err,
   set,
 }: {
-  error: Error
-  set: { status: number }
+  code: string | number
+  error: unknown
+  set: { status?: number | HttpStatus }
 }) => {
-  let statusCode = 500
-  const response: ApiResponse<null> = {
-    success: false,
-    error: {
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred',
-    },
-    data: null,
+  if (code === 'VALIDATION') {
+    set.status = 'Unprocessable Content'
+    const parsed = typeof (err as Error).message === 'string'
+      ? (() => { try { return JSON.parse((err as Error).message) } catch { return null } })()
+      : null
+
+    return {
+      success: false,
+      data: null,
+      error: {
+        code: 'VALIDATION.REQUEST',
+        message: parsed?.message ?? 'Validation failed',
+        details: parsed?.errors?.map((e: { path?: string[]; message: string }) => ({
+          field: ((e.path ?? []).join('.') || parsed?.property) ?? 'unknown',
+          message: e.message,
+        })),
+      },
+    } satisfies ApiResponse<null>
+  }
+
+  if (code === 'PARSE') {
+    set.status = 'Bad Request'
+    return {
+      success: false,
+      data: null,
+      error: { code: 'REQUEST.MALFORMED_BODY', message: 'Malformed body' },
+    } satisfies ApiResponse<null>
+  }
+
+  if (code === 'NOT_FOUND') {
+    set.status = 'Not Found'
+    return {
+      success: false,
+      data: null,
+      error: { code: 'REQUEST.NOT_FOUND', message: 'Route not found' },
+    } satisfies ApiResponse<null>
   }
 
   if (err instanceof AppError) {
-    statusCode = err.statusCode
-    response.error = {
-      code: err.code,
-      message: err.message,
-    }
-  } else if (err instanceof ZodError) {
-    statusCode = 422
-    response.error = {
-      code: 'VALIDATION_ERROR',
-      message: 'Validation failed',
-      details: err.issues.map((e) => ({
-        field: e.path.join('.'),
-        message: e.message,
-      })),
-    }
-  } else if (err instanceof SyntaxError) {
-    statusCode = 400
-    response.error = {
-      code: 'BAD_REQUEST',
-      message: 'Malformed body',
-    }
-  } else if (
-    (err as { message?: string }).message?.includes('ENOTFOUND') ||
-    (err as { message?: string }).message?.includes('getaddrinfo')
-  ) {
-    statusCode = 503
-    response.error = {
-      code: 'SERVICE_UNAVAILABLE',
-      message: 'Database connection failed',
-    }
+    set.status = err.status
+    console.error(err.toJSON())
+    return errorResponse(err)
   }
 
-  if (statusCode === 500) {
-    console.error({ err }, '❌ Unhandled Error')
+  if (err instanceof ZodError) {
+    set.status = 'Unprocessable Content'
+    return {
+      success: false,
+      data: null,
+      error: {
+        code: 'VALIDATION.SCHEMA',
+        message: 'Validation failed',
+        details: err.issues.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      },
+    } satisfies ApiResponse<null>
   }
 
-  set.status = statusCode
-  return response
+  const message = err instanceof Error ? err.message : ''
+  if (message.includes('ENOTFOUND') || message.includes('getaddrinfo')) {
+    set.status = 'Service Unavailable'
+    return {
+      success: false,
+      data: null,
+      error: {
+        code: 'INFRA.CONNECTION_FAILED',
+        message: 'Database connection failed',
+      },
+    } satisfies ApiResponse<null>
+  }
+
+  console.error({ err }, '❌ Unhandled Error')
+  set.status = 'Internal Server Error'
+  return {
+    success: false,
+    data: null,
+    error: {
+      code: 'UNKNOWN.UNHANDLED',
+      message: 'An unexpected error occurred',
+    },
+  } satisfies ApiResponse<null>
 }
