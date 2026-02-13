@@ -7,7 +7,13 @@ import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
 import type { GeneratedAudio } from '@/schemas/generated-audio'
 import type { ModelMetadata } from '@/types'
 export const audioService = {
-  async generate(prompt: string): Promise<{
+  async generate({
+    prompt,
+    voiceId,
+  }: {
+    prompt: string
+    voiceId?: string
+  }): Promise<{
     audio: GeneratedAudio
     modelMetadata: ModelMetadata
   }> {
@@ -24,11 +30,12 @@ export const audioService = {
       () =>
         executeAudioTask({
           model,
-          messages: [{ role: 'user', content: prompt }],
+          prompt,
+          voiceId,
         }),
       { provider: model.provider, modelId: model.id, type: 'voice' }
     )
-    console.log('Audio task result:', taskResult)
+
 
     if (!taskResult.result) {
       throw new AppError({
