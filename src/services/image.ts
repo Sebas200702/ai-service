@@ -15,7 +15,11 @@ export const imageService = {
     const model = getNextImageModel()
 
     if (!model) {
-      throw new AppError('No image models available', 500)
+      throw new AppError({
+        service: 'image',
+        operation: 'model_selection',
+        reason: 'No image models available',
+      })
     }
 
     const { result: task, metrics } = await metricsRecorder(
@@ -28,7 +32,11 @@ export const imageService = {
     )
 
     if (!task.result) {
-      throw new AppError('Image generation failed', 500)
+      throw new AppError({
+        service: 'image',
+        operation: 'generation',
+        reason: 'Image generation returned empty result',
+      })
     }
 
     const { base64 } = task.result
