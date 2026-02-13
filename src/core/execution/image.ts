@@ -1,15 +1,11 @@
-import { generateText } from 'ai'
+import { generateText, type GeneratedFile } from 'ai'
 import type { AITaskResult, ExecuteTextTaskInput } from '@/core/execution/types'
 
 export const executeImageTask = async ({
   model,
   messages,
 }: ExecuteTextTaskInput): Promise<
-  AITaskResult<{
-    base64: string
-    uint8Array: Uint8Array
-    mediaType: string
-  } | null>
+  AITaskResult<GeneratedFile| null>
 > => {
   const { files } = await generateText({
     model: model.model,
