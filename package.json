@@ -34,6 +34,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "elysia": "^1.4.22",
+    "music-metadata": "^11.12.0",
     "node-appwrite": "^21.1.0",
     "pino": "^10.2.1",
     "sharp": "^0.34.5",
