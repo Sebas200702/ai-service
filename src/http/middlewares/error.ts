@@ -159,9 +159,16 @@ export const onError = ({
 }) => {
   if (code === 'VALIDATION') {
     set.status = 'Unprocessable Content'
-    const parsed = typeof (err as Error).message === 'string'
-      ? (() => { try { return JSON.parse((err as Error).message) } catch { return null } })()
-      : null
+    const parsed =
+      typeof (err as Error).message === 'string'
+        ? (() => {
+            try {
+              return JSON.parse((err as Error).message)
+            } catch {
+              return null
+            }
+          })()
+        : null
 
     return {
       success: false,
@@ -169,10 +176,12 @@ export const onError = ({
       error: {
         code: 'VALIDATION.REQUEST',
         message: parsed?.message ?? 'Validation failed',
-        details: parsed?.errors?.map((e: { path?: string[]; message: string }) => ({
-          field: ((e.path ?? []).join('.') || parsed?.property) ?? 'unknown',
-          message: e.message,
-        })),
+        details: parsed?.errors?.map(
+          (e: { path?: string[]; message: string }) => ({
+            field: ((e.path ?? []).join('.') || parsed?.property) ?? 'unknown',
+            message: e.message,
+          })
+        ),
       },
     } satisfies ApiResponse<null>
   }
