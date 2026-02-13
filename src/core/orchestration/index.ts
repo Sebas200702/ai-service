@@ -132,4 +132,4 @@ function createRoundRobin<T>(models: T[]) {
 export const getNextTextModel = createRoundRobin(textModels)
 export const getNextImageModel = createRoundRobin(imageModels)
 export const getNextTranscriptionModel = createRoundRobin(transcriptionModels)
-export const getNextVoiceModel = createRoundRobin(voiceModels)
+export const getNextAudioModel = createRoundRobin(voiceModels)
