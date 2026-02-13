@@ -50,7 +50,11 @@ export const metricsRecorder = async <T>(
       service: modelMetadata.type,
       operation: 'execution',
       reason: 'AI task failed during execution',
-      metadata: { provider: modelMetadata.provider, modelId: modelMetadata.modelId, latency: endTime - startTime },
+      metadata: {
+        provider: modelMetadata.provider,
+        modelId: modelMetadata.modelId,
+        latency: endTime - startTime,
+      },
       cause: error,
     })
   }
