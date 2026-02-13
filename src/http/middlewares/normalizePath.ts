@@ -13,7 +13,6 @@ export const normalizePath = new Elysia({
       return redirect(url.toString(), 308)
     }
   } catch (err) {
-    console.error('Error normalizing path:', err)
     throw new AppError({
       service: 'http',
       operation: 'normalize_path',
