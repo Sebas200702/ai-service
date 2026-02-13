@@ -2,13 +2,18 @@
 import { executeTextTask, executeStreamText } from '@/core/execution/text'
 import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextTextModel } from '@/core/orchestration'
+import { AppError } from '@/http/middlewares/error'
 import type { StandardTextResult, TextStream } from '@/types'
 
 export const textService = {
   async generate(prompt: string): Promise<StandardTextResult> {
     const model = getNextTextModel()
     if (!model) {
-      throw new Error('No text models available')
+      throw new AppError({
+        service: 'text',
+        operation: 'model_selection',
+        reason: 'No text models available',
+      })
     }
 
     const { result: taskResult, metrics } = await metricsRecorder(
@@ -41,7 +46,11 @@ export const textService = {
   async *stream(prompt: string): TextStream {
     const model = getNextTextModel()
     if (!model) {
-      throw new Error('No text models available')
+      throw new AppError({
+        service: 'text',
+        operation: 'model_selection',
+        reason: 'No text models available for streaming',
+      })
     }
 
     const modelMetadata = {
