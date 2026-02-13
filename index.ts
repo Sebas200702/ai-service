@@ -7,7 +7,7 @@ import { loggerConfig } from '@/core/logger'
 import { onError } from '@/http/middlewares/error'
 import { textRoutes } from '@/http/routes/text'
 import { imageRoutes } from '@/http/routes/image'
-import { audioRoutes } from '@/http/routes/auidio'
+import { audioRoutes } from '@/http/routes/audio'
 
 export const app = new Elysia()
   .use(cors({ origin: '*' }))
