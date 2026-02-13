@@ -46,6 +46,12 @@ export const metricsRecorder = async <T>(
       metrics,
     })
 
-    throw new AppError('AI task failed', 500)
+    throw new AppError({
+      service: modelMetadata.type,
+      operation: 'execution',
+      reason: 'AI task failed during execution',
+      metadata: { provider: modelMetadata.provider, modelId: modelMetadata.modelId, latency: endTime - startTime },
+      cause: error,
+    })
   }
 }
