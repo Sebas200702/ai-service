@@ -41,11 +41,6 @@ export const metricsRecorder = async <T>(
       timestamp: startTime,
     }
 
-    console.error('Error during AI task execution:', {
-      error,
-      metrics,
-    })
-
     throw new AppError({
       service: modelMetadata.type,
       operation: 'execution',
