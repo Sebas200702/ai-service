@@ -6,12 +6,13 @@ import { z } from 'zod'
 
 const inputAudioSchema = z.object({
   prompt: z.string(),
+  voiceId: z.string().optional(),
 })
 
 export const audioRoutes = new Elysia({ prefix: '/audio' }).post(
   '/generate',
   async ({ body }) => {
-    return await audioController.generateAudio({ prompt: body.prompt })
+    return await audioController.generateAudio({ prompt: body.prompt, voiceId: body.voiceId  })
   },
   {
     body: inputAudioSchema,
