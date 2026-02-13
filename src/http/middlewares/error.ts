@@ -206,7 +206,6 @@ export const onError = ({
 
   if (err instanceof AppError) {
     set.status = err.status
-    console.error(err.toJSON())
     return errorResponse(err)
   }
 
@@ -239,7 +238,6 @@ export const onError = ({
     } satisfies ApiResponse<null>
   }
 
-  console.error({ err }, '❌ Unhandled Error')
   set.status = 'Internal Server Error'
   return {
     success: false,
