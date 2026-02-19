@@ -1,7 +1,7 @@
 import { audioController } from '@/http/controllers/audio'
 import { Elysia } from 'elysia'
 import { createResponseSchema } from '@/http/openapi/open-api'
-import { generatedAudioSchema } from '@/schemas/generated-audio'
+import { generatedAudioSchema } from '@/schemas/audio'
 import { z } from 'zod'
 
 const inputAudioSchema = z.object({
@@ -9,10 +9,14 @@ const inputAudioSchema = z.object({
   voiceId: z.string().optional(),
 })
 
+
 export const audioRoutes = new Elysia({ prefix: '/audio' }).post(
   '/generate',
   async ({ body }) => {
-    return await audioController.generateAudio({ prompt: body.prompt, voiceId: body.voiceId  })
+    return await audioController.generateAudio({
+      prompt: body.prompt,
+      voiceId: body.voiceId,
+    })
   },
   {
     body: inputAudioSchema,
