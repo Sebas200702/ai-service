@@ -14,10 +14,55 @@ import {
   openRouterTextModelV4,
 } from '@/infra/ai/open-router'
 import { cerebrasTextModel } from '@/infra/ai/cerebras'
+import {
+  githubTextModel,
+  githubTextModelV2,
+  githubTextModelV3,
+} from '@/infra/ai/github'
+import { nvidiaTextModel } from '@/infra/ai/nvidia'
+import { nscaleImageModel } from '@/infra/ai/nscale'
 import type { AIModelDescriptor } from '@/types'
-import type { LanguageModel, SpeechModel, TranscriptionModel } from 'ai'
+import type {
+  ImageModel,
+  LanguageModel,
+  SpeechModel,
+  TranscriptionModel,
+} from 'ai'
+import { ollmTextModel } from '@/infra/ai/olm'
+import { ministralTextModel } from '@/infra/ai/ministral'
+import { cohereTextModel } from '@/infra/ai/cohere'
 
 export const textModels: AIModelDescriptor<LanguageModel>[] = [
+  {
+    id: 'cohere-command-a-reasoning-08-2025',
+    provider: 'cohere',
+    type: 'text',
+    model: cohereTextModel,
+  },
+  {
+    id: 'github-gpt-4o',
+    provider: 'github',
+    type: 'text',
+    model: githubTextModel,
+  },
+  {
+    id: 'ministral-3.0',
+    provider: 'ministral',
+    type: 'text',
+    model: ministralTextModel,
+  },
+  {
+    id: 'github-llama-3.1-405b',
+    provider: 'github',
+    type: 'text',
+    model: githubTextModelV2,
+  },
+  {
+    id: 'github-mistral-large',
+    provider: 'github',
+    type: 'text',
+    model: githubTextModelV3,
+  },
   {
     id: 'arcee-ai/trinity-large-preview:free',
     provider: 'openrouter',
@@ -35,6 +80,12 @@ export const textModels: AIModelDescriptor<LanguageModel>[] = [
     provider: 'openrouter',
     type: 'text',
     model: openRouterTextModelV3,
+  },
+  {
+    id: 'nvidia-nemotron-70b',
+    provider: 'nvidia',
+    type: 'text',
+    model: nvidiaTextModel,
   },
   {
     id: 'gpt-oss-120b',
@@ -61,6 +112,13 @@ export const textModels: AIModelDescriptor<LanguageModel>[] = [
     model: groqModel,
   },
   {
+    id: 'phala-kimi-k2.5',
+    provider: 'ollm',
+    type: 'text',
+    model: ollmTextModel,
+  },
+
+  {
     id: 'gemini-3-flash',
     provider: 'gemini',
     type: 'text',
@@ -74,7 +132,23 @@ export const textModels: AIModelDescriptor<LanguageModel>[] = [
   },
 ]
 
-export const imageModels: AIModelDescriptor<LanguageModel>[] = [
+export const imageModels: (
+  | AIModelDescriptor<LanguageModel>
+  | AIModelDescriptor<ImageModel>
+  | AIModelDescriptor<string>
+)[] = [
+  {
+    id: 'nscale-sdxl-lightning',
+    provider: 'nscale',
+    type: 'image',
+    model: nscaleImageModel,
+  },
+  {
+    id: 'qwen-image-2512',
+    provider: 'apifree',
+    type: 'image',
+    model: 'apifree-qwen-image',
+  },
   {
     id: 'gemini-3.0-image',
     provider: 'gemini',
