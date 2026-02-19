@@ -1,5 +1,5 @@
 import { imageService } from '@/services/image'
-import type { GeneratedImage } from '@/schemas/generated-image'
+import type { GeneratedImage } from '@/schemas/image'
 import type { ApiResponse } from '@/types'
 
 const generateImage = async (input: { prompt: string }) => {
