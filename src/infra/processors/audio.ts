@@ -1,3 +1,4 @@
+import { AppError } from '@/http/middlewares/error'
 import { parseBuffer } from 'music-metadata'
 
 export const getAudioDuration = async (buffer: Buffer): Promise<number> => {
@@ -55,4 +56,17 @@ export const processAudio = async (
     format,
     fileName,
   }
+}
+
+export const fetchAudioBuffer = async (url: string): Promise<Buffer> => {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new AppError({
+      service: 'audio',
+      operation: 'fetch',
+      reason: `Failed to fetch audio from URL: ${response.statusText}`,
+    })
+  }
+  const arrayBuffer = await response.arrayBuffer()
+  return Buffer.from(arrayBuffer)
 }
