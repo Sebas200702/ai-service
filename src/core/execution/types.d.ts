@@ -14,6 +14,7 @@ export type AITaskResult<T> = {
 export interface ExecuteTextTaskInput {
   model: AIModelDescriptor<LanguageModel>
   messages?: Message[]
+  audioFile?: File | Buffer
   voiceId?: string
   prompt?: string
 }
