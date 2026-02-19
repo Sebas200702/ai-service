@@ -10,5 +10,12 @@ export const createResponseSchema = <T extends z.ZodType>(schema: T) =>
       })
       .nullable()
       .optional(),
+    modelMetadata: z
+      .object({
+        modelId: z.string(),
+        provider: z.string(),
+        type: z.string(),
+      })
+      .optional(),
   })
 
