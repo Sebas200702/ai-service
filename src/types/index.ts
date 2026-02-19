@@ -1,6 +1,8 @@
 import type { StreamEvent } from '@/core/streaming/events'
 import type { GeneratedText } from '@/schemas/text'
-
+import type { GeneratedAudio } from '@/schemas/audio'
+import type { GeneratedImage } from '@/schemas/image'
+import type { GeneratedTranscription } from '@/schemas/transcription'
 
 type AIModalities = 'text' | 'image' | 'voice' | 'transcription'
 export interface AIModelDescriptor<T> {
@@ -38,9 +40,13 @@ export enum LogLevel {
   Error = 'error',
 }
 
-export interface StandardTextResult {
-  data: GeneratedText
+export interface StandardResult<T> {
+  data: T
   modelMetadata: ModelMetadata
 }
 
+export type StandardTextResult = StandardResult<GeneratedText>
+export type StandardImageResult = StandardResult<GeneratedImage>
+export type StandardAudioResult = StandardResult<GeneratedAudio>
+export type StandardTranscriptionResult = StandardResult<GeneratedTranscription>
 export type TextStream = AsyncGenerator<StreamEvent>
