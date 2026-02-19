@@ -1,5 +1,5 @@
 import { audioService } from '@/services/audio'
-import type { GeneratedAudio } from '@/schemas/generated-audio'
+import type { GeneratedAudio } from '@/schemas/audio'
 import type { ApiResponse } from '@/types'
 
 const generateAudio = async ({
@@ -9,13 +9,13 @@ const generateAudio = async ({
   prompt: string
   voiceId?: string
 }) => {
-  const { audio, modelMetadata } = await audioService.generate({
+  const { data, modelMetadata } = await audioService.generate({
     prompt,
     voiceId,
   })
   const response: ApiResponse<GeneratedAudio> = {
     success: true,
-    data: audio,
+    data,
     error: null,
     modelMetadata: modelMetadata,
   }
