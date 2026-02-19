@@ -4,8 +4,7 @@ import { getNextAudioModel } from '@/core/orchestration'
 import { AppError } from '@/http/middlewares/error'
 import { processAudio } from '@/infra/processors/audio'
 import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
-import type { GeneratedAudio } from '@/schemas/generated-audio'
-import type { ModelMetadata } from '@/types'
+import type { StandardAudioResult } from '@/types'
 export const audioService = {
   async generate({
     prompt,
@@ -13,10 +12,7 @@ export const audioService = {
   }: {
     prompt: string
     voiceId?: string
-  }): Promise<{
-    audio: GeneratedAudio
-    modelMetadata: ModelMetadata
-  }> {
+  }): Promise<StandardAudioResult> {
     const model = getNextAudioModel()
     if (!model) {
       throw new AppError({
@@ -56,7 +52,7 @@ export const audioService = {
     const audioUrl = getPublicFilePreviewUrl(uploaded.$id, 'audio')
 
     return {
-      audio: {
+      data: {
         audioUrl,
         durationSeconds,
         format,
