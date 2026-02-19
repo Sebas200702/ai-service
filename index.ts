@@ -8,6 +8,7 @@ import { onError } from '@/http/middlewares/error'
 import { textRoutes } from '@/http/routes/text'
 import { imageRoutes } from '@/http/routes/image'
 import { audioRoutes } from '@/http/routes/audio'
+import { transcriptionRoutes } from '@/http/routes/transcription'
 
 export const app = new Elysia()
   .use(cors({ origin: '*' }))
@@ -17,6 +18,5 @@ export const app = new Elysia()
   .use(textRoutes)
   .use(imageRoutes)
   .use(audioRoutes)
+  .use(transcriptionRoutes)
   .listen(CONFIG.PORT)
-
-
