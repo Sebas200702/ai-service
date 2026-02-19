@@ -17,4 +17,13 @@ export const CONFIG = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
   CEREBRAS_API_KEY: process.env.CEREBRAS_API_KEY || '',
+  HF_API_KEY: process.env.HF_API_KEY || '',
+  OLLM_API_KEY: process.env.OLLM_API_KEY || '',
+  AI_GATEWAY_API_KEY: process.env.AI_GATEWAY_API_KEY || '',
+  GITHUB_MODELS_API_KEY: process.env.GITHUB_MODELS_API_KEY || '',
+  NVIDIA_API_KEY: process.env.NVIDIA_API_KEY || '',
+  MINISTRAL_API_KEY: process.env.MINISTRAL_API_KEY || '',
+  APIFREE_API_KEY: process.env.APIFREE_API_KEY || '',
+  NSCALE_API_KEY: process.env.NSCALE_API_KEY || '',
+  COHERE_API_KEY: process.env.COHERE_API_KEY || '',
 }
