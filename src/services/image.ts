@@ -3,7 +3,7 @@ import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextImageModel } from '@/core/orchestration'
 import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
 import { proccesImage } from '@/infra/processors/sharp'
-import type { GeneratedImage } from '@/schemas/generated-image'
+import type { GeneratedImage } from '@/schemas/image'
 import type { ModelMetadata } from '@/types'
 import { AppError } from '@/http/middlewares/error'
 
@@ -21,52 +21,60 @@ export const imageService = {
         reason: 'No image models available',
       })
     }
+    try {
+      const { result: task, metrics } = await metricsRecorder(
+        () =>
+          executeImageTask({
+            model,
+            prompt,
+          }),
+        { provider: model.provider, modelId: model.id, type: 'image' }
+      )
 
-    const { result: task, metrics } = await metricsRecorder(
-      () =>
-        executeImageTask({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      { provider: model.provider, modelId: model.id, type: 'image' }
-    )
+      if (!task.result) {
+        throw new AppError({
+          service: 'image',
+          operation: 'generation',
+          reason: 'Image generation returned empty result',
+        })
+      }
 
-    if (!task.result) {
+      const buffer = Buffer.from(task.result.uint8Array)
+
+      const {
+        buffer: webpBuffer,
+        width,
+        height,
+        fileName,
+      } = await proccesImage(buffer, 80)
+
+      const uploaded = await createFile({
+        buffer: webpBuffer,
+        name: fileName,
+      })
+      const imageUrl = getPublicFilePreviewUrl(uploaded.$id)
+
+      return {
+        data: {
+          imageUrl,
+          width,
+          height,
+          altText: `Generated image for prompt: ${prompt}`,
+        },
+        modelMetadata: {
+          provider: metrics.provider,
+          modelId: metrics.modelId,
+          type: 'image',
+        },
+      }
+    } catch (error) {
+      console.error('Error during image generation:', error)
       throw new AppError({
         service: 'image',
         operation: 'generation',
-        reason: 'Image generation returned empty result',
+        reason:
+          (error as Error).message || 'Unknown error during image generation',
       })
-    }
-
-    const { base64 } = task.result
-    const buffer = Buffer.from(base64, 'base64')
-
-    const {
-      buffer: webpBuffer,
-      width,
-      height,
-      fileName,
-    } = await proccesImage(buffer, 80)
-
-    const uploaded = await createFile({
-      buffer: webpBuffer,
-      name: fileName,
-    })
-    const imageUrl = getPublicFilePreviewUrl(uploaded.$id)
-
-    return {
-      data: {
-        imageUrl,
-        width,
-        height,
-        altText: `Generated image for prompt: ${prompt}`,
-      },
-      modelMetadata: {
-        provider: metrics.provider,
-        modelId: metrics.modelId,
-        type: 'image',
-      },
     }
   },
 }
