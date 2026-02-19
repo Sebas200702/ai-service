@@ -10,5 +10,5 @@ const nscale = createOpenAICompatible({
 })
 
 export const nscaleImageModel = nscale.imageModel(
-  'ByteDance/SDXL-Lightning-4step',
+  'ByteDance/SDXL-Lightning-4step'
 )
