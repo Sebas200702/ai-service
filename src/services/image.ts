@@ -53,7 +53,7 @@ export const imageService = {
       })
 
       const uploaded = await createFile({
-        bucket: 'images',
+        bucket: 'image',
         filePath: `${fileName}.webp`,
         file,
       })
