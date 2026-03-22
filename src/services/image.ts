@@ -1,7 +1,7 @@
 import { executeImageTask } from '@/core/execution/image'
 import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextImageModel } from '@/core/orchestration'
-import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
+import { createFile } from '@/infra/storage'
 import { proccesImage } from '@/infra/processors/sharp'
 import type { GeneratedImage } from '@/schemas/image'
 import type { ModelMetadata } from '@/types'
@@ -48,15 +48,19 @@ export const imageService = {
         fileName,
       } = await proccesImage(buffer, 80)
 
-      const uploaded = await createFile({
-        buffer: webpBuffer,
-        name: fileName,
+      const file = new File([webpBuffer], `${fileName}.webp`, {
+        type: 'image/webp',
       })
-      const imageUrl = getPublicFilePreviewUrl(uploaded.$id)
+
+      const uploaded = await createFile({
+        bucket: 'images',
+        filePath: `${fileName}.webp`,
+        file,
+      })
 
       return {
         data: {
-          imageUrl,
+          imageUrl: uploaded.fullPath,
           width,
           height,
           altText: `Generated image for prompt: ${prompt}`,

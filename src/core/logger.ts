@@ -1,10 +1,10 @@
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 import { LogLevel } from '@/types'
 
 export const loggerConfig = {
-  level: CONFIG.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: env.NODE_ENV === 'development' ? 'debug' : 'info',
   transport:
-    CONFIG.NODE_ENV === 'development'
+    env.NODE_ENV === 'development'
       ? {
           target: 'pino-pretty',
           options: {

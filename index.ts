@@ -2,7 +2,7 @@ import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { fromTypes, openapi } from '@elysiajs/openapi'
 import { logger as elysiaLogger } from '@bogeychan/elysia-logger'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 import { loggerConfig } from '@/core/logger'
 import { onError } from '@/http/middlewares/error'
 import { textRoutes } from '@/http/routes/text'
@@ -19,4 +19,4 @@ export const app = new Elysia()
   .use(imageRoutes)
   .use(audioRoutes)
   .use(transcriptionRoutes)
-  .listen(CONFIG.PORT)
+  .listen(env.PORT)
