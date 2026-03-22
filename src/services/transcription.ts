@@ -2,6 +2,7 @@ import { executeTranscriptionTask } from '@/core/execution/transcription'
 import { getNextTranscriptionModel } from '@/core/orchestration/index'
 import { AppError } from '@/http/middlewares/error'
 import { fetchAudioBuffer } from '@/infra/processors/audio'
+
 import type { StandardTranscriptionResult } from '@/types'
 
 export const transcriptionService = {
@@ -32,7 +33,7 @@ export const transcriptionService = {
             ? await fetchAudioBuffer(audioFile)
             : audioFile,
       })
-      
+
       return {
         data: result,
         modelMetadata: {
