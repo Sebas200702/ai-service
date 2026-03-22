@@ -1,7 +1,8 @@
-import { executeTextTask, executeStreamText } from '@/core/execution/text'
+import { executeStreamText, executeTextTask } from '@/core/execution/text'
 import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextTextModel } from '@/core/orchestration'
 import { AppError } from '@/http/middlewares/error'
+
 import type { StandardTextResult, TextStream } from '@/types'
 
 export const textService = {
