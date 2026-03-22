@@ -441,13 +441,13 @@ Create a new file in `src/infra/ai/` (e.g., `src/infra/ai/my-provider.ts`):
 
 ```typescript
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 
 const myProvider = createOpenAICompatible({
   name: 'my-provider',
   baseURL: 'https://api.my-provider.com/v1',
   headers: {
-    Authorization: `Bearer ${CONFIG.MY_PROVIDER_API_KEY}`,
+    Authorization: `Bearer ${env.MY_PROVIDER_API_KEY}`,
   },
 })
 

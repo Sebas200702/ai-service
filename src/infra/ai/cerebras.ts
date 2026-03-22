@@ -1,9 +1,8 @@
 import { createCerebras } from '@ai-sdk/cerebras'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 
 const cerebras = createCerebras({
-  apiKey: CONFIG.CEREBRAS_API_KEY ?? '',
+  apiKey: env.CEREBRAS_API_KEY ?? '',
 })
 
 export const cerebrasTextModel = cerebras.languageModel('gpt-oss-120b')
-

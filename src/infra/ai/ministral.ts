@@ -1,7 +1,7 @@
 import { createMistral } from '@ai-sdk/mistral'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 const mistral = createMistral({
-  apiKey: CONFIG.MINISTRAL_API_KEY,
+  apiKey: env.MINISTRAL_API_KEY,
 })
 
 export const ministralTextModel = mistral('mistral-large-latest')

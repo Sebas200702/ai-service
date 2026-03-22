@@ -1,11 +1,11 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 
 const nscale = createOpenAICompatible({
   name: 'nscale',
   baseURL: 'https://inference.api.nscale.com/v1',
   headers: {
-    Authorization: `Bearer ${CONFIG.NSCALE_API_KEY}`,
+    Authorization: `Bearer ${env.NSCALE_API_KEY}`,
   },
 })
 

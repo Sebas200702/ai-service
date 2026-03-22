@@ -1,4 +1,4 @@
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 
 const APIFREE_BASE_URL = 'https://api.skycoding.ai'
 const POLL_INTERVAL_MS = 2000
@@ -28,7 +28,7 @@ async function submitImageRequest(prompt: string): Promise<string> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${CONFIG.APIFREE_API_KEY}`,
+      Authorization: `Bearer ${env.APIFREE_API_KEY}`,
     },
     body: JSON.stringify({
       model: 'qwen/qwen-image-2512',
@@ -55,7 +55,7 @@ async function pollForResult(requestId: string): Promise<string[]> {
       `${APIFREE_BASE_URL}/v1/image/${requestId}/result`,
       {
         headers: {
-          Authorization: `Bearer ${CONFIG.APIFREE_API_KEY}`,
+          Authorization: `Bearer ${env.APIFREE_API_KEY}`,
         },
       }
     )

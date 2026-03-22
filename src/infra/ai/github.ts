@@ -1,11 +1,11 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { CONFIG } from '@/config'
+import { env } from '@/env'
 
 const github = createOpenAICompatible({
   name: 'github',
   baseURL: 'https://models.inference.ai.azure.com',
   headers: {
-    Authorization: `Bearer ${CONFIG.GITHUB_MODELS_API_KEY}`,
+    Authorization: `Bearer ${env.GITHUB_MODELS_API_KEY}`,
   },
 })
 

@@ -3,7 +3,7 @@ import { metricsRecorder } from '@/core/metrics/recorder'
 import { getNextAudioModel } from '@/core/orchestration'
 import { AppError } from '@/http/middlewares/error'
 import { processAudio } from '@/infra/processors/audio'
-import { createFile, getPublicFilePreviewUrl } from '@/infra/storage/appwrite'
+import { createFile } from '@/infra/storage'
 import type { StandardAudioResult } from '@/types'
 export const audioService = {
   async generate({
@@ -32,7 +32,6 @@ export const audioService = {
       { provider: model.provider, modelId: model.id, type: 'voice' }
     )
 
-
     if (!taskResult.result) {
       throw new AppError({
         service: 'audio',
@@ -43,17 +42,19 @@ export const audioService = {
 
     const buffer = Buffer.from(taskResult.result.uint8Array)
     const { durationSeconds, format, fileName } = await processAudio(buffer)
+    const file = new File([buffer], `${fileName}.${format}`, {
+      type: `audio/${format}`,
+    })
 
     const uploaded = await createFile({
-      buffer,
-      name: fileName,
-      type: 'audio',
+      bucket: 'audio',
+      file,
+      filePath: `${fileName}.${format}`,
     })
-    const audioUrl = getPublicFilePreviewUrl(uploaded.$id, 'audio')
 
     return {
       data: {
-        audioUrl,
+        audioUrl: uploaded.fullPath,
         durationSeconds,
         format,
       },
