@@ -54,7 +54,7 @@ export const audioService = {
 
     return {
       data: {
-        audioUrl: uploaded.fullPath,
+        audioUrl: uploaded.publicUrl,
         durationSeconds,
         format,
       },

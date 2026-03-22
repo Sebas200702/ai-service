@@ -60,7 +60,7 @@ export const imageService = {
 
       return {
         data: {
-          imageUrl: uploaded.fullPath,
+          imageUrl: uploaded.publicUrl,
           width,
           height,
           altText: `Generated image for prompt: ${prompt}`,

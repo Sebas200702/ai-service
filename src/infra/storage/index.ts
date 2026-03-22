@@ -23,5 +23,8 @@ export const createFile = async ({
       reason: error.message,
     })
   }
-  return data
+
+  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath)
+
+  return { ...data, publicUrl: urlData.publicUrl }
 }
