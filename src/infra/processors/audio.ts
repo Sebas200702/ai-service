@@ -1,5 +1,6 @@
-import { AppError } from '@/http/middlewares/error'
 import { parseBuffer } from 'music-metadata'
+
+import { AppError } from '@/http/middlewares/error'
 
 export const getAudioDuration = async (buffer: Buffer): Promise<number> => {
   const metadata = await parseBuffer(buffer)
