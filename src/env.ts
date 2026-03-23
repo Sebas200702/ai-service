@@ -1,7 +1,6 @@
 import { config } from 'dotenv'
 config()
 
-
 export const env = {
   PORT: Number(process.env.PORT) || 3000,
   ASSEMBLYAI_API_KEY: process.env.ASSEMBLYAI_API_KEY || '',
