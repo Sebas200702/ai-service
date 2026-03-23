@@ -1,7 +1,28 @@
+import { env } from '@/env'
 import { supabase } from '@/infra/supabase/client'
 
 import type { Metrics } from '@/core/metrics/types'
 import { updateModelLatencyStats } from '@/infra/supabase/model-latency-stats'
+
+const serializeSupabaseError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return error
+  }
+
+  const supabaseError = error as {
+    message?: string
+    code?: string
+    details?: string
+    hint?: string
+  }
+
+  return {
+    message: supabaseError.message,
+    code: supabaseError.code,
+    details: supabaseError.details,
+    hint: supabaseError.hint,
+  }
+}
 
 export const saveMetrics = async (metrics: Metrics) => {
   const { error } = await supabase.from('metrics').insert({
@@ -9,9 +30,9 @@ export const saveMetrics = async (metrics: Metrics) => {
     model_id: metrics.modelId,
     type: metrics.type,
     reason: metrics.reason,
-    input_tokens: metrics.inputTokens,
-    output_tokens: metrics.outputTokens,
-    total_tokens: metrics.totalTokens,
+    input_tokens: metrics.inputTokens ?? 0,
+    output_tokens: metrics.outputTokens ?? 0,
+    total_tokens: metrics.totalTokens ?? 0,
     latency: metrics.latency,
     total_cost: metrics.totalCost,
     is_cost_estimated: metrics.isCostEstimated,
@@ -24,7 +45,10 @@ export const saveMetrics = async (metrics: Metrics) => {
   })
 
   if (error) {
-    console.error('Failed to persist metrics:', error.message)
+    console.error('Failed to persist metrics:', {
+      table: 'metrics',
+      error: serializeSupabaseError(error),
+    })
     return
   }
 
