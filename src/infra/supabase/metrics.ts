@@ -3,6 +3,14 @@ import { supabase } from '@/infra/supabase/client'
 import type { Metrics } from '@/core/metrics/types'
 import { updateModelLatencyStats } from '@/infra/supabase/model-latency-stats'
 
+const serializeSupabaseError = (error: unknown) => {
+  if (!error || typeof error !== 'object') {
+    return { raw: error }
+  }
+
+  return { ...(error as Record<string, unknown>) }
+}
+
 export const saveMetrics = async (metrics: Metrics) => {
   const { error } = await supabase.from('metrics').insert({
     provider: metrics.provider,
@@ -24,7 +32,10 @@ export const saveMetrics = async (metrics: Metrics) => {
   })
 
   if (error) {
-    console.error('Failed to persist metrics:', error.message)
+    console.error('Failed to persist metrics:', {
+      table: 'metrics',
+      error: serializeSupabaseError(error),
+    })
     return
   }
 

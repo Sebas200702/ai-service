@@ -100,7 +100,7 @@ export const transcriptionService = {
             totalCost: seconds * perSecond,
             isCostEstimated: true,
           }
-        }
+        },
       )
 
       return {

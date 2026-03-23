@@ -40,7 +40,7 @@ const containerToExtension: Record<string, string> = {
 }
 
 export const processAudio = async (
-  buffer: Buffer
+  buffer: Buffer,
 ): Promise<{
   buffer: Buffer
   durationSeconds: number

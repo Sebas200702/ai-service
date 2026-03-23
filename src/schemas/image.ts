@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requestSchema } from '@/schemas/request'
+import type { requestSchema } from '@/schemas/request'
 
 export const generatedImageSchema = z.object({
   imageUrl: z.url(),

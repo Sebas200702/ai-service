@@ -1,5 +1,5 @@
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { env } from '@/env'
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 
 const nscale = createOpenAICompatible({
   name: 'nscale',
@@ -10,5 +10,5 @@ const nscale = createOpenAICompatible({
 })
 
 export const nscaleImageModel = nscale.imageModel(
-  'ByteDance/SDXL-Lightning-4step'
+  'ByteDance/SDXL-Lightning-4step',
 )

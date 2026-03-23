@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { requestSchema } from '@/schemas/request'
+import type { requestSchema } from '@/schemas/request'
 
 export const generatedAudioSchema = z.object({
   audioUrl: z.url(),

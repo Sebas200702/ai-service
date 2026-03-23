@@ -1,6 +1,6 @@
 import {
-  experimental_generateSpeech as generateSpeech,
   type GeneratedAudioFile,
+  experimental_generateSpeech as generateSpeech,
 } from 'ai'
 
 import { getFamilyFallbackCandidates } from '@/core/execution/fallback'
@@ -16,7 +16,7 @@ export const executeAudioTask = async ({
     throw AppError.BadRequest(
       'audio',
       'generation',
-      'Prompt is required for audio generation'
+      'Prompt is required for audio generation',
     )
   }
 

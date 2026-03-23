@@ -19,5 +19,5 @@ export const transcriptionRoutes = new Elysia({
     response: {
       200: createResponseSchema(generatedTranscriptionSchema),
     },
-  }
+  },
 )

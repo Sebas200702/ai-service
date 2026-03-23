@@ -1,5 +1,5 @@
-import { supabase } from '@/infra/supabase/client'
 import { AppError } from '@/http/middlewares/error'
+import { supabase } from '@/infra/supabase/client'
 
 export const createFile = async ({
   bucket,

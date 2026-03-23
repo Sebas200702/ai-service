@@ -11,7 +11,7 @@ type LatencyMetricRow = {
 
 export async function withLowestLatency<T extends AIModelDescriptor<unknown>>(
   models: T[],
-  type: AIModalities
+  type: AIModalities,
 ) {
   const { data, error } = await supabase
     .from('model_latency_stats')

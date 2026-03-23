@@ -5,17 +5,17 @@ export const getFamilyFallbackCandidates = <
 >(
   primary: T,
   fallbackModels: T[] = [],
-  maxAttempts = 2
+  maxAttempts = 2,
 ) => {
   if (maxAttempts <= 1) {
     return [primary]
   }
 
   const crossProviderFallbacks = fallbackModels.filter(
-    (candidate) => candidate.provider !== primary.provider
+    (candidate) => candidate.provider !== primary.provider,
   )
   const familyFallbacks = fallbackModels.filter(
-    (candidate) => candidate.provider === primary.provider
+    (candidate) => candidate.provider === primary.provider,
   )
 
   const orderedFallbacks = [...crossProviderFallbacks, ...familyFallbacks]

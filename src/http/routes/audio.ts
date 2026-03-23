@@ -14,5 +14,5 @@ export const audioRoutes = new Elysia({ prefix: '/audio' }).post(
     response: {
       200: createResponseSchema(generatedAudioSchema),
     },
-  }
+  },
 )

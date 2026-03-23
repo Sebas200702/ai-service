@@ -14,5 +14,5 @@ export const streamEventSchema = z.custom<TextStream>(
   },
   {
     message: 'Debe ser un AsyncGenerator válido',
-  }
+  },
 )

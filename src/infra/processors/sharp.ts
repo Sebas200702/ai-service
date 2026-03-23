@@ -15,7 +15,7 @@ export const getImageSize = async (buffer: Buffer) => {
 
 export const proccesImage = async (
   buffer: Buffer,
-  quality = 80
+  quality = 80,
 ): Promise<{
   buffer: Buffer
   width: number

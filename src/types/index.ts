@@ -1,7 +1,7 @@
 import type { StreamEvent } from '@/core/streaming/events'
-import type { GeneratedText } from '@/schemas/text'
 import type { GeneratedAudio } from '@/schemas/audio'
 import type { GeneratedImage } from '@/schemas/image'
+import type { GeneratedText } from '@/schemas/text'
 import type { GeneratedTranscription } from '@/schemas/transcription'
 
 export type AIModalities = 'text' | 'image' | 'voice' | 'transcription'

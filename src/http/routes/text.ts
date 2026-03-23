@@ -15,7 +15,7 @@ export const textRoutes = new Elysia({ prefix: '/text' })
       response: {
         200: createResponseSchema(generatedTextSchema),
       },
-    }
+    },
   )
   .post(
     '/stream',
@@ -29,5 +29,5 @@ export const textRoutes = new Elysia({ prefix: '/text' })
     {
       body: inputTextSchema,
       response: undefined, // Streaming response does not have a fixed schema
-    }
+    },
   )

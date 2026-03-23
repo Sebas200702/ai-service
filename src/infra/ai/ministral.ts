@@ -1,5 +1,5 @@
-import { createMistral } from '@ai-sdk/mistral'
 import { env } from '@/env'
+import { createMistral } from '@ai-sdk/mistral'
 const mistral = createMistral({
   apiKey: env.MINISTRAL_API_KEY,
 })

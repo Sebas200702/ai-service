@@ -4,11 +4,11 @@ import {
   getImageModelCandidates,
   getNextImageModel,
 } from '@/core/orchestration'
-import { createFile } from '@/infra/storage'
+import { AppError } from '@/http/middlewares/error'
 import { proccesImage } from '@/infra/processors/sharp'
+import { createFile } from '@/infra/storage'
 import type { GeneratedImage, InputImage } from '@/schemas/image'
 import type { ModelMetadata } from '@/types'
-import { AppError } from '@/http/middlewares/error'
 
 export const imageService = {
   async generateImage(input: InputImage): Promise<{
@@ -87,7 +87,7 @@ export const imageService = {
             totalCost: perImage,
             isCostEstimated: true,
           }
-        }
+        },
       )
 
       if (!task.result) {

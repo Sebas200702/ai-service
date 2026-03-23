@@ -1,10 +1,10 @@
+import { AppError } from '@/http/middlewares/error'
 import type {
   AISelectionMode,
   AISelectionStrategy,
   ModelMetadata,
   ModelPricingUsd,
 } from '@/types'
-import { AppError } from '@/http/middlewares/error'
 
 import type { Metrics, RecordedResult, TokenUsage } from '@/core/metrics/types'
 import { saveMetrics } from '@/infra/supabase/metrics'
@@ -24,7 +24,7 @@ interface CostEstimationResult {
 
 const calculateTokenEstimatedCost = (
   usage: TokenUsage | undefined,
-  pricing: ModelPricingUsd | undefined
+  pricing: ModelPricingUsd | undefined,
 ): CostEstimationResult => {
   if (
     !pricing ||
@@ -50,14 +50,14 @@ export const metricsRecorder = async <T>(
   modelMetadata: MetricsRecorderContext,
   resolveMetadata?: (
     result: T,
-    base: MetricsRecorderContext
+    base: MetricsRecorderContext,
   ) => MetricsRecorderContext,
   getUsage?: (result: T) => TokenUsage,
   resolveCost?: (
     result: T,
     context: MetricsRecorderContext,
-    usage?: TokenUsage
-  ) => CostEstimationResult
+    usage?: TokenUsage,
+  ) => CostEstimationResult,
 ): Promise<RecordedResult<T>> => {
   const startTime = Date.now()
 

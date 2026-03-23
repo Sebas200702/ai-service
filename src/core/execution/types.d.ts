@@ -1,5 +1,5 @@
-import type { AIModelDescriptor, LanguageModel, Message } from 'ai'
 import type { ModelPricingUsd } from '@/types'
+import type { AIModelDescriptor, LanguageModel, Message } from 'ai'
 
 export type AITaskResult<T> = {
   result: T

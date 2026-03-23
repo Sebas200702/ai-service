@@ -14,5 +14,5 @@ export const imageRoutes = new Elysia({ prefix: '/image' }).post(
     response: {
       200: createResponseSchema(generatedImageSchema),
     },
-  }
+  },
 )

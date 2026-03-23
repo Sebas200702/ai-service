@@ -15,8 +15,8 @@ import {
   openRouterTextModelV4,
 } from '@/infra/ai/open-router'
 
-import { vertexModel } from '@/infra/ai/vertex'
 import { textModelPricing } from '@/core/models/pricing'
+import { vertexModel } from '@/infra/ai/vertex'
 import type { AIModelDescriptor } from '@/types'
 import type { LanguageModel } from 'ai'
 
@@ -102,9 +102,8 @@ const baseTextModels: AIModelDescriptor<LanguageModel>[] = [
   },
 ]
 
-export const textModels: AIModelDescriptor<LanguageModel>[] = baseTextModels.map(
-  (model) => ({
+export const textModels: AIModelDescriptor<LanguageModel>[] =
+  baseTextModels.map((model) => ({
     ...model,
     pricing: textModelPricing[model.id] ?? undefined,
-  })
-)
+  }))

@@ -52,7 +52,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -67,7 +67,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason = 'Unauthorized',
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -82,7 +82,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason = 'Forbidden',
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -97,7 +97,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason = 'Resource not found',
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -112,7 +112,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -127,7 +127,7 @@ export class AppError extends Error {
     service: string,
     operation: string,
     reason = 'Internal server error',
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     return new AppError({
       service,
@@ -181,7 +181,7 @@ export const onError = ({
           (e: { path?: string[]; message: string }) => ({
             field: ((e.path ?? []).join('.') || parsed?.property) ?? 'unknown',
             message: e.message,
-          })
+          }),
         ),
       },
       modelMetadata: null,

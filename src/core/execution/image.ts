@@ -1,9 +1,9 @@
 import {
   type GeneratedFile,
-  generateImage,
-  generateText,
   type ImageModel,
   type LanguageModel,
+  generateImage,
+  generateText,
 } from 'ai'
 
 import { getFamilyFallbackCandidates } from '@/core/execution/fallback'
@@ -18,7 +18,7 @@ type ImageTaskModel =
 
 const runImageCandidate = async (
   candidate: ImageTaskModel,
-  prompt: string
+  prompt: string,
 ): Promise<AITaskResult<GeneratedFile | null>> => {
   if (typeof candidate.model === 'string') {
     const { base64, mimeType } = await generateApifreeImage(prompt)

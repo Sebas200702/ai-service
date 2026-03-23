@@ -1,5 +1,5 @@
-import type { AITaskResult, ExecuteTextTaskInput } from '@/core/execution/types'
 import { getFamilyFallbackCandidates } from '@/core/execution/fallback'
+import type { AITaskResult, ExecuteTextTaskInput } from '@/core/execution/types'
 import { generateText, streamText } from 'ai'
 
 export const executeTextTask = async ({

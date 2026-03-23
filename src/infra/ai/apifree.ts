@@ -57,7 +57,7 @@ async function pollForResult(requestId: string): Promise<string[]> {
         headers: {
           Authorization: `Bearer ${env.APIFREE_API_KEY}`,
         },
-      }
+      },
     )
 
     const data = (await response.json()) as ApifreeResultResponse
@@ -71,7 +71,7 @@ async function pollForResult(requestId: string): Promise<string[]> {
     }
     if (status === 'error' || status === 'failed') {
       throw new Error(
-        `APIFree generation failed: ${data.resp_data.error ?? 'Unknown error'}`
+        `APIFree generation failed: ${data.resp_data.error ?? 'Unknown error'}`,
       )
     }
   }
@@ -85,7 +85,7 @@ async function downloadImageAsBase64(url: string): Promise<string> {
 }
 
 export async function generateApifreeImage(
-  prompt: string
+  prompt: string,
 ): Promise<{ base64: string; mimeType: string }> {
   const requestId = await submitImageRequest(prompt)
   const imageUrls = await pollForResult(requestId)

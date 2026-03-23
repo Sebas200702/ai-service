@@ -67,7 +67,7 @@ export const textService = {
           inputTokens: res.usage?.promptTokens ?? null,
           outputTokens: res.usage?.completionTokens ?? null,
           totalTokens: res.usage?.totalTokens ?? null,
-        })
+        }),
       )
 
       return {

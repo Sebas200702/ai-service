@@ -1,5 +1,5 @@
-import { createOLLM } from '@ofoundation/ollm'
 import { env } from '@/env'
+import { createOLLM } from '@ofoundation/ollm'
 
 const ollm = createOLLM({
   apiKey: env.OLLM_API_KEY,

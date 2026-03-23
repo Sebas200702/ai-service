@@ -1,5 +1,5 @@
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { env } from '@/env'
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 
 const nim = createOpenAICompatible({
   name: 'nim',

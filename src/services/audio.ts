@@ -109,7 +109,7 @@ export const audioService = {
           totalCost: seconds * perSecond,
           isCostEstimated: true,
         }
-      }
+      },
     )
 
     const {

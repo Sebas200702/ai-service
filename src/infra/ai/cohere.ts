@@ -1,5 +1,5 @@
-import { createCohere } from '@ai-sdk/cohere'
 import { env } from '@/env'
+import { createCohere } from '@ai-sdk/cohere'
 const cohere = createCohere({
   apiKey: env.COHERE_API_KEY,
 })

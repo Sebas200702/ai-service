@@ -1,7 +1,7 @@
+import { transcriptionModelPricing } from '@/core/models/pricing'
 import { assemblyaiTranscriptionModel } from '@/infra/ai/assembly'
 import { elevenlabsTranscriptionModel } from '@/infra/ai/eleven'
 import { groqTranscriptionModel } from '@/infra/ai/groq'
-import { transcriptionModelPricing } from '@/core/models/pricing'
 import type { AIModelDescriptor } from '@/types'
 import type { TranscriptionModel } from 'ai'
 

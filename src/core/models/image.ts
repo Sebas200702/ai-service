@@ -2,8 +2,8 @@ import { geminiImageModel } from '@/infra/ai/gemini'
 
 import { nscaleImageModel } from '@/infra/ai/nscale'
 
-import { vertexImageModel } from '@/infra/ai/vertex'
 import { imageModelPricing } from '@/core/models/pricing'
+import { vertexImageModel } from '@/infra/ai/vertex'
 
 import type { AIModelDescriptor } from '@/types'
 import type { ImageModel, LanguageModel } from 'ai'

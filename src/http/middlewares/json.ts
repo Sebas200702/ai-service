@@ -1,5 +1,5 @@
-import { Elysia } from 'elysia'
 import type { ApiResponse } from '@/types'
+import { Elysia } from 'elysia'
 
 export const requireJson = new Elysia({ name: 'require-json' }).onBeforeHandle(
   ({ request, set }) => {
@@ -23,5 +23,5 @@ export const requireJson = new Elysia({ name: 'require-json' }).onBeforeHandle(
         return response
       }
     }
-  }
+  },
 )

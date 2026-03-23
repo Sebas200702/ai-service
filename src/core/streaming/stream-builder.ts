@@ -7,9 +7,7 @@ export function createEventStream(
     async start(controller) {
       try {
         for await (const event of generator) {
-          controller.enqueue(
-            `${JSON.stringify(event)}\n`,
-          )
+          controller.enqueue(`${JSON.stringify(event)}\n`)
         }
         controller.close()
       } catch (error) {

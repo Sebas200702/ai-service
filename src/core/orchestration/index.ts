@@ -7,10 +7,10 @@ import {
 import { withCheapestPricing } from '@/core/orchestration/low-cost'
 import { withLowestLatency } from '@/core/orchestration/low-latency'
 import type {
-  AISelectionMode,
-  AISelectionStrategy,
   AIModalities,
   AIModelDescriptor,
+  AISelectionMode,
+  AISelectionStrategy,
 } from '@/types'
 
 export type ModelSelectionInput = {
@@ -60,7 +60,7 @@ function getCachedSelector<T>(cacheKey: string, models: T[]) {
 
 function selectManualModel<T extends { id: string }>(
   models: T[],
-  modelId?: string
+  modelId?: string,
 ) {
   if (!modelId) {
     throw new Error('Manual mode requires a modelId')
@@ -77,7 +77,7 @@ function selectManualModel<T extends { id: string }>(
 async function resolveOrderedModels<T extends AIModelDescriptor<unknown>>(
   models: T[],
   type: AIModalities,
-  selection: ModelSelectionInput
+  selection: ModelSelectionInput,
 ) {
   if (selection.mode === 'manual') {
     return selectManualModel(models, selection.modelId)
@@ -97,7 +97,7 @@ async function resolveOrderedModels<T extends AIModelDescriptor<unknown>>(
 async function getNextModel<T extends AIModelDescriptor<unknown>>(
   models: T[],
   type: AIModalities,
-  selection: ModelSelectionInput
+  selection: ModelSelectionInput,
 ) {
   const orderedModels = await resolveOrderedModels(models, type, selection)
   const cacheKey = `${type}:${selection.mode}:${selection.strategy}`
@@ -109,7 +109,7 @@ async function getNextModel<T extends AIModelDescriptor<unknown>>(
 async function getModelCandidates<T extends AIModelDescriptor<unknown>>(
   models: T[],
   type: AIModalities,
-  selection: ModelSelectionInput
+  selection: ModelSelectionInput,
 ) {
   return await resolveOrderedModels(models, type, selection)
 }
@@ -128,7 +128,7 @@ export const getTextModelCandidates = (selection: ModelSelectionInput) =>
 export const getImageModelCandidates = (selection: ModelSelectionInput) =>
   getModelCandidates(imageModels, 'image', selection)
 export const getTranscriptionModelCandidates = (
-  selection: ModelSelectionInput
+  selection: ModelSelectionInput,
 ) => getModelCandidates(transcriptionModels, 'transcription', selection)
 export const getAudioModelCandidates = (selection: ModelSelectionInput) =>
   getModelCandidates(voiceModels, 'voice', selection)
