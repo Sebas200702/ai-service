@@ -36,7 +36,6 @@ export const apiErrorSchema = z
     details: z.array(responseDetailSchema).optional(),
   })
   .nullable()
-  .optional()
 
 export const createApiResponseSchema = <T extends z.ZodType>(schema: T) =>
   z.object({
