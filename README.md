@@ -1,19 +1,44 @@
-# ai-service
+# Nexus IA: The Multimodal Intelligence Backbone
 
-A unified multimodal AI API service that aggregates **16+ AI providers** behind a single REST interface. Built with [Bun](https://bun.sh), [Elysia](https://elysiajs.com), and [Vercel AI SDK v6](https://ai-sdk.dev).
+Nexus IA is a high-performance AI orchestrator built for the next generation of multimodal applications. It serves as a unified gateway to the world's most powerful AI models, providing a seamless, type-safe, and ultra-fast interface for developers.
 
-Supports **text generation**, **image generation**, **audio synthesis (TTS)**, and **audio transcription** with automatic round-robin load balancing across all registered models.
+Built with [Bun](https://bun.sh) and [Elysia](https://elysiajs.com), Nexus IA is engineered for sub-millisecond overhead and maximum scalability. Aggregates **16+ AI providers** behind a single REST interface with support for **text generation**, **image generation**, **audio synthesis (TTS)**, and **audio transcription**.
 
 ## Table of Contents
 
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
+- [API Structure](#api-structure)
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [AI Providers & Models](#ai-providers--models)
+- [Installation & Local Development](#installation--local-development)
+- [Deployment](#deployment)
 - [Environment Variables](#environment-variables)
-- [Getting Started](#getting-started)
 - [Adding a New Provider](#adding-a-new-provider)
 - [License](#license)
+
+## Key Features
+
+- **Multimodal Orchestration** — Unified access to text, image, audio, and transcription models
+- **Provider Agnostic** — Seamlessly switch between Gemini, Groq, OpenAI, Cohere, and 11+ more
+- **Strategy-Based Selection** — Automatic model orchestration by cost, latency, or manual selection
+- **High Performance** — Powered by Bun for 3x faster startup times than Node.js
+- **Fallback Intelligence** — Automatic failover across providers with attempt tracking and detailed metadata
+- **Developer First** — Auto-generated OpenAPI/Swagger documentation with strict TypeScript type safety
+- **Metrics & Analytics** — Built-in latency tracking, token usage monitoring, and cost estimation
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Runtime** | [Bun](https://bun.sh) v1.0+ |
+| **Framework** | [Elysia](https://elysiajs.com) |
+| **AI SDK** | [Vercel AI SDK v6](https://ai-sdk.dev) |
+| **Validation** | [Zod v4](https://zod.dev) |
+| **Database** | [Supabase](https://supabase.com) (metrics & stats) |
+| **Formatting** | [Biome](https://biomejs.dev) |
 
 ## Architecture
 
@@ -69,20 +94,30 @@ graph TD
 ```
 index.ts                        # Elysia app entry point
 src/
-├── config.ts                   # Environment variables (dotenv)
+├── env.ts                      # Environment variables (dotenv)
 ├── core/
 │   ├── logger.ts               # Pino logger configuration
-│   ├── execution/              # AI task execution layer
+│   ├── execution/              # AI task execution layer with fallback support
 │   │   ├── text.ts             # generateText / streamText
 │   │   ├── image.ts            # generateImage / generateText (image) / custom
 │   │   ├── audio.ts            # experimental_generateSpeech
 │   │   ├── transcription.ts    # experimental_transcribe
+│   │   ├── fallback.ts         # Fallback candidate selection & prioritization
 │   │   └── types.d.ts          # Execution input/output types
 │   ├── metrics/
-│   │   ├── recorder.ts         # Latency & usage metrics wrapper
+│   │   ├── recorder.ts         # Latency, usage, cost metrics wrapper
 │   │   └── types.d.ts          # Metrics types
-│   ├── orchestration/
-│   │   └── index.ts            # Model registries + round-robin selection
+│   ├── models/                 # Centralized model catalogs
+│   │   ├── text.ts             # All text models with pricing
+│   │   ├── image.ts            # All image models
+│   │   ├── audio.ts            # Voice models
+│   │   ├── transcription.ts    # Transcription models
+│   │   ├── pricing.ts          # Pricing lookup tables
+│   │   └── index.ts            # Model exports
+│   ├── orchestration/          # Strategy-based selection
+│   │   ├── index.ts            # Model registries + selection logic
+│   │   ├── low-cost.ts         # Cost-based model ordering
+│   │   └── low-latency.ts      # Latency-based model ordering
 │   └── streaming/
 │       ├── events.ts           # StreamEvent type definitions
 │       └── stream-builder.ts   # ReadableStream from AsyncGenerator
@@ -113,23 +148,24 @@ src/
 │   │   ├── gemini.ts           # Google Gemini (text + image)
 │   │   ├── github.ts           # GitHub Models (text)
 │   │   ├── groq.ts             # Groq (text + transcription)
-│   │   ├── hugginface.ts       # HuggingFace (image — not in rotation)
 │   │   ├── ministral.ts        # Mistral (text)
 │   │   ├── nscale.ts           # nscale (image)
 │   │   ├── nvidia.ts           # NVIDIA NIM (text)
 │   │   ├── olm.ts              # oLLM (text)
 │   │   ├── open-router.ts      # OpenRouter (text)
 │   │   ├── perplexity.ts       # Perplexity (text)
-│   │   ├── vercel.ts           # Vercel AI Gateway (image — not in rotation)
 │   │   └── vertex.ts           # Vertex AI (text + image)
-│   ├── database/
-│   │   └── appwrite.ts         # Appwrite client
 │   ├── processors/
 │   │   ├── audio.ts            # Audio metadata extraction + URL fetch
 │   │   └── sharp.ts            # Image conversion to WebP
-│   └── storage/
-│       └── appwrite.ts         # Appwrite S3-compatible file storage
+│   ├── storage/
+│   │   └── index.ts            # File storage interface
+│   └── supabase/
+│       ├── client.ts           # Supabase client
+│       ├── metrics.ts          # Metrics persistence
+│       └── model-latency-stats.ts  # Latency stats management
 ├── schemas/                    # Zod v4 validation schemas
+│   ├── request.ts              # Unified request schema
 │   ├── audio.ts
 │   ├── image.ts
 │   ├── stream.ts
@@ -143,6 +179,19 @@ src/
 └── types/
     └── index.ts                # Shared type definitions
 ```
+
+## API Structure
+
+**Base URL:** `https://nexus-ia.tech/api/v1` (production) or `http://localhost:3000/api/v1` (local)
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/text` | `POST` | Advanced LLM orchestration (Groq, Gemini, and 14 more) |
+| `/text/stream` | `POST` | Streaming text generation via Server-Sent Events |
+| `/image` | `POST` | High-fidelity image generation |
+| `/audio` | `POST` | Realistic Text-to-Speech (TTS) |
+| `/transcription` | `POST` | Fast Speech-to-Text processing |
+| `/swagger` | `GET` | Interactive OpenAPI documentation |
 
 ## API Endpoints
 
@@ -359,6 +408,103 @@ curl -X POST http://localhost:3000/transcription/transcribe \
 | ---------- | ----------- | -------------------- |
 | ElevenLabs | `eleven_v3` | `@ai-sdk/elevenlabs` |
 
+## Installation & Local Development
+
+### Prerequisites
+
+- [Bun](https://bun.sh) v1.0+
+- API keys from desired AI providers (see [Environment Variables](#environment-variables))
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Sebas200702/ai-service.git
+cd ai-service
+```
+
+### Install Dependencies
+
+```bash
+bun install
+```
+
+### Configure Environment Variables
+
+Create a `.env` file in the project root based on the template:
+
+```bash
+cp .env.example .env  # if available, or create manually
+```
+
+Then populate with your API keys:
+
+```env
+PORT=3000
+NODE_ENV=development
+
+# AI Providers
+GEMINI_API_KEY=your_key
+VERTEX_API_KEY=your_key
+GROQ_API_KEY=your_key
+# Add other providers as needed (see Environment Variables section)
+```
+
+### Start Development Server
+
+```bash
+bun dev
+```
+
+Starts the server with watch mode at `http://localhost:3000`. Access OpenAPI docs at `http://localhost:3000/swagger`.
+
+### Production Build
+
+```bash
+bun run build
+bun run start
+```
+
+### Code Formatting & Linting
+
+```bash
+bun run format
+```
+
+Uses [Biome](https://biomejs.dev) for linting and formatting.
+
+## Deployment
+
+Nexus IA is containerized with Docker for seamless deployment across any cloud platform.
+
+### Docker Build
+
+```bash
+docker build -t nexus-ia:latest .
+```
+
+The project uses a multi-stage Docker build to keep the image size optimized for fast deployments.
+
+### Docker Run
+
+```bash
+docker run -p 3000:3000 \
+  -e PORT=3000 \
+  -e GEMINI_API_KEY=your_key \
+  -e GROQ_API_KEY=your_key \
+  # Add other env vars as needed
+  nexus-ia:latest
+```
+
+### Cloud Deployment Options
+
+- **Dokploy** — Automated CI/CD and deployment orchestration
+- **Railway** — Simple deployment from Git with automatic SSL
+- **Fly.io** — Global edge deployment with auto-scaling
+- **Vercel** — Serverless deployment for edge functions
+- **Docker Hub** — Push and deploy from container registry
+
+> **Recommendation:** Use Dokploy or Railway for managed CI/CD and automatic HTTPS with Let's Encrypt certificates.
+
 ## Environment Variables
 
 Create a `.env` file in the project root:
@@ -396,40 +542,6 @@ S3_AUDIO_BUCKET_ID=
 ```
 
 > **Note:** The service starts even if some API keys are missing — requests to those providers will simply fail on their turn in the round-robin rotation.
-
-## Getting Started
-
-### Prerequisites
-
-- [Bun](https://bun.sh) v1.0+
-
-### Installation
-
-```bash
-bun install
-```
-
-### Development
-
-```bash
-bun run dev
-```
-
-Starts the server with watch mode at `http://localhost:3000`.
-
-### Production
-
-```bash
-bun run start
-```
-
-### Formatting
-
-```bash
-bun run format
-```
-
-Uses [Biome](https://biomejs.dev) for linting and formatting.
 
 ## Adding a New Provider
 
@@ -489,4 +601,4 @@ That's it. The model will automatically be included in the round-robin rotation.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is open source and available under the MIT License. See the [LICENSE](LICENSE) file for details.
