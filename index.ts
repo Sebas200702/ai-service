@@ -10,7 +10,7 @@ import { imageRoutes } from '@/http/routes/image'
 import { audioRoutes } from '@/http/routes/audio'
 import { transcriptionRoutes } from '@/http/routes/transcription'
 
-export const app = new Elysia()
+const apiV1 = new Elysia({ prefix: '/api/v1' })
   .use(cors({ origin: '*' }))
   .use(elysiaLogger(loggerConfig))
   .use(openapi({ references: fromTypes() }))
@@ -19,4 +19,5 @@ export const app = new Elysia()
   .use(imageRoutes)
   .use(audioRoutes)
   .use(transcriptionRoutes)
-  .listen(env.PORT)
+
+export const app = new Elysia().use(apiV1).listen(env.PORT)
