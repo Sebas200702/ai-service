@@ -8,17 +8,7 @@ export const textRoutes = new Elysia({ prefix: '/text' })
   .post(
     '/generate',
     async ({ body }) => {
-      const result = await textController.generateText(body)
-
-      return {
-        success: true,
-        data: {
-          text: result.text,
-          length: result.text.length,
-          modelMetadata: result.modelMetadata,
-        },
-        error: null,
-      }
+      return await textController.generateText(body)
     },
     {
       body: inputTextSchema,

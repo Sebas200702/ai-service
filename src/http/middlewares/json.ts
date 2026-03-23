@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia'
+import type { ApiResponse } from '@/types'
 
 export const requireJson = new Elysia({ name: 'require-json' }).onBeforeHandle(
   ({ request, set }) => {
@@ -9,11 +10,17 @@ export const requireJson = new Elysia({ name: 'require-json' }).onBeforeHandle(
 
       if (!contentType?.includes('application/json')) {
         set.status = 415
-        return {
+        const response: ApiResponse<null> = {
           success: false,
-          error: 'Content-Type must be application/json',
+          modelMetadata: null,
           data: null,
+          error: {
+            code: 'REQUEST.UNSUPPORTED_MEDIA_TYPE',
+            message: 'Content-Type must be application/json',
+          },
         }
+
+        return response
       }
     }
   }

@@ -146,6 +146,7 @@ const errorResponse = (error: AppError): ApiResponse<null> => ({
     code: error.code,
     message: error.message,
   },
+  modelMetadata: null,
 })
 
 export const onError = ({
@@ -183,6 +184,7 @@ export const onError = ({
           })
         ),
       },
+      modelMetadata: null,
     } satisfies ApiResponse<null>
   }
 
@@ -192,6 +194,7 @@ export const onError = ({
       success: false,
       data: null,
       error: { code: 'REQUEST.MALFORMED_BODY', message: 'Malformed body' },
+      modelMetadata: null,
     } satisfies ApiResponse<null>
   }
 
@@ -201,6 +204,7 @@ export const onError = ({
       success: false,
       data: null,
       error: { code: 'REQUEST.NOT_FOUND', message: 'Route not found' },
+      modelMetadata: null,
     } satisfies ApiResponse<null>
   }
 
@@ -222,6 +226,7 @@ export const onError = ({
           message: e.message,
         })),
       },
+      modelMetadata: null,
     } satisfies ApiResponse<null>
   }
 
@@ -235,6 +240,7 @@ export const onError = ({
         code: 'INFRA.CONNECTION_FAILED',
         message: 'Database connection failed',
       },
+      modelMetadata: null,
     } satisfies ApiResponse<null>
   }
 
@@ -246,5 +252,6 @@ export const onError = ({
       code: 'UNKNOWN.UNHANDLED',
       message: 'An unexpected error occurred',
     },
+    modelMetadata: null,
   } satisfies ApiResponse<null>
 }
