@@ -1,4 +1,5 @@
 import { Elysia, redirect } from 'elysia'
+
 import { AppError } from '@/http/middlewares/error'
 
 export const normalizePath = new Elysia({

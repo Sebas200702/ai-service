@@ -1,18 +1,26 @@
-import type { ModelMetadata } from '@/types'
+import type {
+  AISelectionMode,
+  AISelectionStrategy,
+  ModelMetadata,
+} from '@/types'
 
 export interface TokenUsage {
-  inputTokens: number
-  outputTokens: number
-  totalTokens: number
+  inputTokens: number | null
+  outputTokens: number | null
+  totalTokens: number | null
 }
 
 export interface Metrics extends ModelMetadata, TokenUsage {
+  mode: AISelectionMode
+  strategy: AISelectionStrategy
+  reason: string | null
   latency: number
   timeToFirstToken?: number
 
-  totalCost?: number
+  totalCost: number
+  isCostEstimated: boolean
   success: boolean
-  errorType?: string
+  errorType: string | null
   fallbackUsed: boolean
 
   timestamp: number
