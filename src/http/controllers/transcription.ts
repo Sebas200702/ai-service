@@ -1,10 +1,12 @@
 import type { ApiResponse } from '@/types'
-import type { GeneratedTranscription } from '@/schemas/transcription'
+import type {
+  GeneratedTranscription,
+  InputTranscription,
+} from '@/schemas/transcription'
 import { transcriptionService } from '@/services/transcription'
 
-const transcribeAudio = async ({ audioFile }: { audioFile: File | string }) => {
-  const { data, modelMetadata } =
-    await transcriptionService.transcribe(audioFile)
+const transcribeAudio = async (input: InputTranscription) => {
+  const { data, modelMetadata } = await transcriptionService.transcribe(input)
   const response: ApiResponse<GeneratedTranscription> = {
     success: true,
     data: data,

@@ -1,13 +1,34 @@
 import { executeStreamText, executeTextTask } from '@/core/execution/text'
 import { metricsRecorder } from '@/core/metrics/recorder'
-import { getNextTextModel } from '@/core/orchestration'
+import { getNextTextModel, getTextModelCandidates } from '@/core/orchestration'
 import { AppError } from '@/http/middlewares/error'
+import type { InputText } from '@/schemas/text'
 
 import type { StandardTextResult, TextStream } from '@/types'
 
 export const textService = {
-  async generate(prompt: string): Promise<StandardTextResult> {
-    const model = getNextTextModel()
+  async generate(input: InputText): Promise<StandardTextResult> {
+    const strategy =
+      input.mode === 'manual' ? 'manual' : (input.strategy ?? 'lowLatency')
+
+    if (input.mode === 'manual' && !input.modelId) {
+      throw new AppError({
+        service: 'text',
+        operation: 'model_selection',
+        reason: 'Manual mode requires a modelId',
+      })
+    }
+
+    const candidates = await getTextModelCandidates({
+      mode: input.mode,
+      strategy,
+      modelId: input.modelId,
+    })
+    const model = await getNextTextModel({
+      mode: input.mode,
+      strategy,
+      modelId: input.modelId,
+    })
     if (!model) {
       throw new AppError({
         service: 'text',
@@ -20,13 +41,32 @@ export const textService = {
         () =>
           executeTextTask({
             model,
-            messages: [{ role: 'user', content: prompt }],
+            fallbackModels: candidates
+              .filter((candidate) => candidate.id !== model.id)
+              .slice(0, 1),
+            messages: [{ role: 'user', content: input.prompt }],
           }),
-        { provider: model.provider, modelId: model.id, type: 'text' },
+        {
+          provider: model.provider,
+          modelId: model.id,
+          type: 'text',
+          mode: input.mode,
+          strategy,
+          pricing: model.pricing,
+        },
+        (result, base) => ({
+          ...base,
+          provider: result.provider,
+          modelId: result.modelId,
+          pricing: result.pricing ?? base.pricing,
+          fallbackUsed:
+            (result.attemptCount ?? 1) > 1 || (result.fallbackUsed ?? false),
+          reason: result.fallbackReason ?? base.reason ?? null,
+        }),
         (res) => ({
-          inputTokens: res.usage?.promptTokens ?? 0,
-          outputTokens: res.usage?.completionTokens ?? 0,
-          totalTokens: res.usage?.totalTokens ?? 0,
+          inputTokens: res.usage?.promptTokens ?? null,
+          outputTokens: res.usage?.completionTokens ?? null,
+          totalTokens: res.usage?.totalTokens ?? null,
         })
       )
 
@@ -39,6 +79,21 @@ export const textService = {
           provider: metrics.provider,
           modelId: metrics.modelId,
           type: 'text',
+          execution: {
+            mode: metrics.mode,
+            strategy: metrics.strategy,
+            attemptCount: taskResult.attemptCount,
+            attemptedModelIds: taskResult.attemptedModelIds,
+            latencyMs: metrics.latency,
+            inputTokens: metrics.inputTokens,
+            outputTokens: metrics.outputTokens,
+            totalTokens: metrics.totalTokens,
+            totalCostUsd: metrics.totalCost,
+            isCostEstimated: metrics.isCostEstimated,
+            fallbackUsed: metrics.fallbackUsed,
+            reason: metrics.reason,
+            timestamp: metrics.timestamp,
+          },
         },
       }
     } catch (error) {
@@ -52,8 +107,28 @@ export const textService = {
     }
   },
 
-  async *stream(prompt: string): TextStream {
-    const model = getNextTextModel()
+  async *stream(input: InputText): TextStream {
+    const strategy =
+      input.mode === 'manual' ? 'manual' : (input.strategy ?? 'lowLatency')
+
+    if (input.mode === 'manual' && !input.modelId) {
+      throw new AppError({
+        service: 'text',
+        operation: 'model_selection',
+        reason: 'Manual mode requires a modelId',
+      })
+    }
+
+    const candidates = await getTextModelCandidates({
+      mode: input.mode,
+      strategy,
+      modelId: input.modelId,
+    })
+    const model = await getNextTextModel({
+      mode: input.mode,
+      strategy,
+      modelId: input.modelId,
+    })
     if (!model) {
       throw new AppError({
         service: 'text',
@@ -72,7 +147,10 @@ export const textService = {
 
     const result = executeStreamText({
       model,
-      messages: [{ role: 'user', content: prompt }],
+      fallbackModels: candidates
+        .filter((candidate) => candidate.id !== model.id)
+        .slice(0, 1),
+      messages: [{ role: 'user', content: input.prompt }],
     })
 
     for await (const chunk of result) {

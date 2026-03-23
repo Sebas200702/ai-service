@@ -4,12 +4,23 @@ import type { GeneratedAudio } from '@/schemas/audio'
 import type { GeneratedImage } from '@/schemas/image'
 import type { GeneratedTranscription } from '@/schemas/transcription'
 
-type AIModalities = 'text' | 'image' | 'voice' | 'transcription'
+export type AIModalities = 'text' | 'image' | 'voice' | 'transcription'
+export type AISelectionMode = 'manual' | 'orchestrated'
+export type AISelectionStrategy = 'manual' | 'lowCost' | 'lowLatency'
+
+export interface ModelPricingUsd {
+  input: number
+  output: number
+  perSecond?: number
+  perImage?: number
+}
+
 export interface AIModelDescriptor<T> {
   id: string
   provider: string
   type: AIModalities
   model: T
+  pricing?: ModelPricingUsd
 }
 
 export interface ApiResponse<T> {
@@ -19,10 +30,28 @@ export interface ApiResponse<T> {
   modelMetadata?: ModelMetadata
 }
 
+export interface ExecutionMetadata {
+  mode: AISelectionMode
+  strategy: AISelectionStrategy
+  attemptCount?: number
+  attemptedModelIds?: string[]
+  latencyMs: number
+  inputTokens: number | null
+  outputTokens: number | null
+  totalTokens: number | null
+  totalCostUsd: number
+  isCostEstimated: boolean
+  fallbackUsed: boolean
+  reason: string | null
+  timestamp: number
+  durationSeconds?: number
+}
+
 export interface ModelMetadata {
   modelId: string
   provider: string
   type: AIModalities
+  execution?: ExecutionMetadata
 }
 
 interface ErrorData {

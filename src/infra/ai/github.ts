@@ -13,4 +13,4 @@ export const githubTextModel = github.chatModel('gpt-4o')
 export const githubTextModelV2 = github.chatModel(
   'Meta-Llama-3.1-405B-Instruct'
 )
-export const githubTextModelV3 = github.chatModel('Mistral-large-2407')
+export const githubTextModelV3 = github.chatModel('gpt-5')

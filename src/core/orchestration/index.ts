@@ -1,195 +1,30 @@
-import { assemblyaiTranscriptionModel } from '@/infra/ai/assembly'
 import {
-  elevenlabsTranscriptionModel,
-  elevenlabsVoiceModel,
-} from '@/infra/ai/eleven'
-import { geminiImageModel, geminiModel } from '@/infra/ai/gemini'
-import { groqModel, groqTranscriptionModel } from '@/infra/ai/groq'
-import { perplexityModel } from '@/infra/ai/perplexity'
-import { vertexImageModel, vertexModel } from '@/infra/ai/vertex'
-import {
-  openRouterTextModel,
-  openRouterTextModelV2,
-  openRouterTextModelV3,
-  openRouterTextModelV4,
-} from '@/infra/ai/open-router'
-import { cerebrasTextModel } from '@/infra/ai/cerebras'
-import {
-  githubTextModel,
-  githubTextModelV2,
-  githubTextModelV3,
-} from '@/infra/ai/github'
-import { nvidiaTextModel } from '@/infra/ai/nvidia'
-import { nscaleImageModel } from '@/infra/ai/nscale'
-import type { AIModelDescriptor } from '@/types'
+  imageModels,
+  textModels,
+  transcriptionModels,
+  voiceModels,
+} from '@/core/models'
+import { withCheapestPricing } from '@/core/orchestration/low-cost'
+import { withLowestLatency } from '@/core/orchestration/low-latency'
 import type {
-  ImageModel,
-  LanguageModel,
-  SpeechModel,
-  TranscriptionModel,
-} from 'ai'
-import { ollmTextModel } from '@/infra/ai/olm'
-import { ministralTextModel } from '@/infra/ai/ministral'
-import { cohereTextModel } from '@/infra/ai/cohere'
+  AISelectionMode,
+  AISelectionStrategy,
+  AIModalities,
+  AIModelDescriptor,
+} from '@/types'
 
-export const textModels: AIModelDescriptor<LanguageModel>[] = [
-  {
-    id: 'cohere-command-a-reasoning-08-2025',
-    provider: 'cohere',
-    type: 'text',
-    model: cohereTextModel,
-  },
-  {
-    id: 'github-gpt-4o',
-    provider: 'github',
-    type: 'text',
-    model: githubTextModel,
-  },
-  {
-    id: 'ministral-3.0',
-    provider: 'ministral',
-    type: 'text',
-    model: ministralTextModel,
-  },
-  {
-    id: 'github-llama-3.1-405b',
-    provider: 'github',
-    type: 'text',
-    model: githubTextModelV2,
-  },
-  {
-    id: 'github-mistral-large',
-    provider: 'github',
-    type: 'text',
-    model: githubTextModelV3,
-  },
-  {
-    id: 'arcee-ai/trinity-large-preview:free',
-    provider: 'openrouter',
-    type: 'text',
-    model: openRouterTextModel,
-  },
-  {
-    id: 'tngtech/deepseek-r1t2-chimera:free',
-    provider: 'openrouter',
-    type: 'text',
-    model: openRouterTextModelV2,
-  },
-  {
-    id: 'qwen/qwen3-next-80b-a3b-instruct:free',
-    provider: 'openrouter',
-    type: 'text',
-    model: openRouterTextModelV3,
-  },
-  {
-    id: 'nvidia-nemotron-70b',
-    provider: 'nvidia',
-    type: 'text',
-    model: nvidiaTextModel,
-  },
-  {
-    id: 'gpt-oss-120b',
-    provider: 'cerebras',
-    type: 'text',
-    model: cerebrasTextModel,
-  },
-  {
-    id: 'z-ai/glm-4.5-air:free',
-    provider: 'openrouter',
-    type: 'text',
-    model: openRouterTextModelV4,
-  },
-  {
-    id: 'perplexity-sonar-pro',
-    provider: 'perplexity',
-    type: 'text',
-    model: perplexityModel,
-  },
-  {
-    id: 'groq-qwen-32b',
-    provider: 'groq',
-    type: 'text',
-    model: groqModel,
-  },
-  {
-    id: 'phala-kimi-k2.5',
-    provider: 'ollm',
-    type: 'text',
-    model: ollmTextModel,
-  },
+export type ModelSelectionInput = {
+  mode: AISelectionMode
+  strategy: AISelectionStrategy
+  modelId?: string
+}
 
-  {
-    id: 'gemini-3-flash',
-    provider: 'gemini',
-    type: 'text',
-    model: geminiModel,
-  },
-  {
-    id: 'vertex-gemini-3.0',
-    provider: 'vertex',
-    type: 'text',
-    model: vertexModel,
-  },
-]
+type SelectorState<T> = {
+  signature: string
+  next: () => T
+}
 
-export const imageModels: (
-  | AIModelDescriptor<LanguageModel>
-  | AIModelDescriptor<ImageModel>
-  | AIModelDescriptor<string>
-)[] = [
-  {
-    id: 'nscale-sdxl-lightning',
-    provider: 'nscale',
-    type: 'image',
-    model: nscaleImageModel,
-  },
-  {
-    id: 'qwen-image-2512',
-    provider: 'apifree',
-    type: 'image',
-    model: 'apifree-qwen-image',
-  },
-  {
-    id: 'gemini-3.0-image',
-    provider: 'gemini',
-    type: 'image',
-    model: geminiImageModel,
-  },
-  {
-    id: 'vertex-gemini-3.0-image',
-    provider: 'vertex',
-    type: 'image',
-    model: vertexImageModel,
-  },
-]
-export const transcriptionModels: AIModelDescriptor<TranscriptionModel>[] = [
-  {
-    id: 'groq-whisper-large-v3',
-    provider: 'groq',
-    type: 'transcription',
-    model: groqTranscriptionModel,
-  },
-  {
-    id: 'assemblyai-standard',
-    provider: 'assemblyai',
-    type: 'transcription',
-    model: assemblyaiTranscriptionModel,
-  },
-  {
-    id: 'elevenlabs-standard-transcription',
-    provider: 'elevenlabs',
-    type: 'transcription',
-    model: elevenlabsTranscriptionModel,
-  },
-]
-export const voiceModels: AIModelDescriptor<SpeechModel>[] = [
-  {
-    id: 'elevenlabs-standard-voice',
-    provider: 'elevenlabs',
-    type: 'voice',
-    model: elevenlabsVoiceModel,
-  },
-]
+const selectorCache = new Map<string, SelectorState<unknown>>()
 
 function createRoundRobin<T>(models: T[]) {
   let index = 0
@@ -203,7 +38,97 @@ function createRoundRobin<T>(models: T[]) {
   }
 }
 
-export const getNextTextModel = createRoundRobin(textModels)
-export const getNextImageModel = createRoundRobin(imageModels)
-export const getNextTranscriptionModel = createRoundRobin(transcriptionModels)
-export const getNextAudioModel = createRoundRobin(voiceModels)
+function signatureOf<T extends { id: string }>(models: T[]) {
+  return models.map((model) => model.id).join('|')
+}
+
+function getCachedSelector<T>(cacheKey: string, models: T[]) {
+  const signature = signatureOf(models as T[] & { id: string }[])
+  const cached = selectorCache.get(cacheKey) as SelectorState<T> | undefined
+
+  if (cached?.signature === signature) {
+    return cached.next
+  }
+
+  const next = createRoundRobin(models)
+  selectorCache.set(cacheKey, {
+    signature,
+    next,
+  })
+  return next
+}
+
+function selectManualModel<T extends { id: string }>(
+  models: T[],
+  modelId?: string
+) {
+  if (!modelId) {
+    throw new Error('Manual mode requires a modelId')
+  }
+
+  const model = models.find((candidate) => candidate.id === modelId)
+  if (!model) {
+    throw new Error(`Model not found: ${modelId}`)
+  }
+
+  return [model]
+}
+
+async function resolveOrderedModels<T extends AIModelDescriptor<unknown>>(
+  models: T[],
+  type: AIModalities,
+  selection: ModelSelectionInput
+) {
+  if (selection.mode === 'manual') {
+    return selectManualModel(models, selection.modelId)
+  }
+
+  if (selection.strategy === 'lowCost') {
+    return withCheapestPricing(models)
+  }
+
+  if (selection.strategy === 'lowLatency') {
+    return await withLowestLatency(models, type)
+  }
+
+  return models
+}
+
+async function getNextModel<T extends AIModelDescriptor<unknown>>(
+  models: T[],
+  type: AIModalities,
+  selection: ModelSelectionInput
+) {
+  const orderedModels = await resolveOrderedModels(models, type, selection)
+  const cacheKey = `${type}:${selection.mode}:${selection.strategy}`
+  const selector = getCachedSelector(cacheKey, orderedModels)
+
+  return selector()
+}
+
+async function getModelCandidates<T extends AIModelDescriptor<unknown>>(
+  models: T[],
+  type: AIModalities,
+  selection: ModelSelectionInput
+) {
+  return await resolveOrderedModels(models, type, selection)
+}
+
+export const getNextTextModel = (selection: ModelSelectionInput) =>
+  getNextModel(textModels, 'text', selection)
+export const getNextImageModel = (selection: ModelSelectionInput) =>
+  getNextModel(imageModels, 'image', selection)
+export const getNextTranscriptionModel = (selection: ModelSelectionInput) =>
+  getNextModel(transcriptionModels, 'transcription', selection)
+export const getNextAudioModel = (selection: ModelSelectionInput) =>
+  getNextModel(voiceModels, 'voice', selection)
+
+export const getTextModelCandidates = (selection: ModelSelectionInput) =>
+  getModelCandidates(textModels, 'text', selection)
+export const getImageModelCandidates = (selection: ModelSelectionInput) =>
+  getModelCandidates(imageModels, 'image', selection)
+export const getTranscriptionModelCandidates = (
+  selection: ModelSelectionInput
+) => getModelCandidates(transcriptionModels, 'transcription', selection)
+export const getAudioModelCandidates = (selection: ModelSelectionInput) =>
+  getModelCandidates(voiceModels, 'voice', selection)

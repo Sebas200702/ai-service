@@ -1,14 +1,14 @@
 import { Elysia } from 'elysia'
-import { createResponseSchema } from '@/http/openapi/open-api'
+
 import { textController } from '@/http/controllers/text'
-import { inputTextSchema, generatedTextSchema } from '@/schemas/text'
+import { createResponseSchema } from '@/http/openapi/open-api'
+import { generatedTextSchema, inputTextSchema } from '@/schemas/text'
+
 export const textRoutes = new Elysia({ prefix: '/text' })
   .post(
     '/generate',
     async ({ body }) => {
-      const result = await textController.generateText({
-        prompt: body.prompt,
-      })
+      const result = await textController.generateText(body)
 
       return {
         success: true,
@@ -25,7 +25,7 @@ export const textRoutes = new Elysia({ prefix: '/text' })
       response: {
         200: createResponseSchema(generatedTextSchema),
       },
-    },
+    }
   )
   .post(
     '/stream',
@@ -33,13 +33,11 @@ export const textRoutes = new Elysia({ prefix: '/text' })
       set.headers['content-type'] = 'text/event-stream'
       set.headers['cache-control'] = 'no-cache'
 
-      const { stream } = textController.streamGenerateText({
-        prompt: body.prompt,
-      })
+      const { stream } = textController.streamGenerateText(body)
       return stream
     },
     {
       body: inputTextSchema,
       response: undefined, // Streaming response does not have a fixed schema
-    },
+    }
   )

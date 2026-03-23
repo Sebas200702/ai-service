@@ -5,4 +5,6 @@ const cerebras = createCerebras({
   apiKey: env.CEREBRAS_API_KEY ?? '',
 })
 
-export const cerebrasTextModel = cerebras.languageModel('gpt-oss-120b')
+export const cerebrasTextModel = cerebras.languageModel(
+  'qwen-3-235b-a22b-instruct-2507'
+)
