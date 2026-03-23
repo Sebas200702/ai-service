@@ -27,7 +27,7 @@ export interface ApiResponse<T> {
   success: boolean
   data: T | null
   error: ErrorData | null
-  modelMetadata?: ModelMetadata
+  modelMetadata: ModelMetadata | null
 }
 
 export interface ExecutionMetadata {

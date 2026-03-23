@@ -1,15 +1,20 @@
+import type { ApiResponse } from '@/types'
+
 import { createEventStream } from '@/core/streaming/stream-builder'
 import { textService } from '@/services/text'
 
-import type { InputText } from '@/schemas/text'
+import type { GeneratedText, InputText } from '@/schemas/text'
 
 const generateText = async (input: InputText) => {
   const { data, modelMetadata } = await textService.generate(input)
-  return {
-    mode: 'standard' as const,
-    text: data.text,
-    modelMetadata: modelMetadata,
+  const response: ApiResponse<GeneratedText> = {
+    success: true,
+    data,
+    error: null,
+    modelMetadata,
   }
+
+  return response
 }
 
 const streamGenerateText = (input: InputText) => {
