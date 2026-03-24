@@ -1,4 +1,3 @@
-import { env } from '@/env'
 import { supabase } from '@/infra/supabase/client'
 
 import type { Metrics } from '@/core/metrics/types'
