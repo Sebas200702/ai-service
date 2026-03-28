@@ -3,12 +3,24 @@ import { supabase } from '@/infra/supabase/client'
 import type { Metrics } from '@/core/metrics/types'
 import { updateModelLatencyStats } from '@/infra/supabase/model-latency-stats'
 
-const serializeSupabaseError = (error: unknown): Record<string, unknown> => {
+const serializeSupabaseError = (error: unknown) => {
   if (!error || typeof error !== 'object') {
-    return { raw: error }
+    return error
   }
 
-  return { ...(error as Record<string, unknown>) }
+  const supabaseError = error as {
+    message?: string
+    code?: string
+    details?: string
+    hint?: string
+  }
+
+  return {
+    message: supabaseError.message,
+    code: supabaseError.code,
+    details: supabaseError.details,
+    hint: supabaseError.hint,
+  }
 }
 
 export const saveMetrics = async (metrics: Metrics) => {
